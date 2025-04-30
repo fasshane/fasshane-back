@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String     @id @default(uuid())
+  email    String     @unique
+  password String?
+  avatar   String?    @default("https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png")
+  name     String
+  role     Role
+  status   UserStatus @default(ACTIVE)
+  googleId String?    @unique
+
+  admin    Admin?
+  customer Customer?
+  manager  Manager?
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id     String @id @default(uuid())
+  userId String @unique
+  points Int    @default(0)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Manager {
+  id         String @id @default(uuid())
+  userId     String @unique
+  department String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  id          String @id @default(uuid())
+  userId      String @unique
+  permissions String
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Supplier {
+  id     String  @id @default(uuid())
+  name   String
+  email  String  @unique
+  rating Decimal @default(1)
+  phone  String?
+  avatar String  @default("https://img.freepik.com/premium-vector/supplier-icon-vector-image-can-be-used-supply-chain_120816-403225.jpg")
+
+  products SupplierProducts[]
+  orders   SupplierOrder[]
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id    String      @id @default(uuid())
+  name  String
+  count Decimal     @default(0)
+  type  ProductType
+  image String?
+
+  supplierProducts SupplierProducts[]
+  mealProducts     Ingredient[]
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type, count, name])
+}
+
+model SupplierProducts {
+  id         String  @id @default(uuid())
+  supplierId String
+  productId  String
+  quantity   Decimal @default(0)
+  price      Decimal
+
+  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createAt   DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  orderItems SupplierOrderItem[]
+
+  @@unique([supplierId, productId])
+  @@index([productId, supplierId])
+}
+
+model SupplierOrder {
+  id         String              @id @default(uuid())
+  supplierId String
+  totalPrice Decimal             @default(0)
+  status     OrderStatus         @default(INITIAL)
+  supplier   Supplier            @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  orderItems SupplierOrderItem[]
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, supplierId])
+}
+
+model SupplierOrderItem {
+  id                String  @id @default(uuid())
+  supplierOrderId   String
+  supplierProductId String
+  quantity          Decimal @default(1)
+  price             Decimal
+
+  order           SupplierOrder    @relation(fields: [supplierOrderId], references: [id], onDelete: Cascade)
+  supplierProduct SupplierProducts @relation(fields: [supplierProductId], references: [id], onDelete: Cascade)
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Ingredient {
+  id        String  @id @default(uuid())
+  mealId    String
+  productId String
+  quantity  Decimal @default(1)
+
+  meal    Meal    @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([mealId, productId])
+}
+
+model Meal {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  image       String?
+  ingredients Ingredient[]
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum UserStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum Role {
+  CUSTOMER
+  MANAGER
+  ADMIN
+}
+
+enum ProductType {
+  WEIGHT
+  LIQUID
+}
+
+enum OrderStatus {
+  INITIAL
+  IN_PROGRESS
+  DELIVERED
+  CANCELLED
+  FAILED
+}
