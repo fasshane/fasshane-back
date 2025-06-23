@@ -16,6 +16,7 @@ model User {
   role     Role
   status   UserStatus @default(ACTIVE)
   googleId String?    @unique
+  Basket    Basket?
 
   admin    Admin?
   customer Customer?
@@ -80,8 +81,9 @@ model Product {
   supplierProducts SupplierProducts[]
   mealProducts     Ingredient[]
 
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createAt   DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  BasketItem BasketItem[]
 
   @@index([type, count, name])
 }
@@ -156,6 +158,32 @@ model Meal {
 
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Basket {
+  id         String   @id @default(uuid())
+  customerId String   @unique
+  customer   User     @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  items BasketItem[]
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model BasketItem {
+  id        String @id @default(uuid())
+  basketId  String
+  productId String
+  quantity  Int    @default(1)
+
+  basket  Basket  @relation(fields: [basketId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([basketId, productId])
 }
 
 enum UserStatus {
