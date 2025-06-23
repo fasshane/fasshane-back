@@ -61,6 +61,7 @@ model Supplier {
   name   String
   email  String  @unique
   rating Decimal @default(1)
+  active Boolean @default(true)
   phone  String?
   avatar String  @default("https://img.freepik.com/premium-vector/supplier-icon-vector-image-can-be-used-supply-chain_120816-403225.jpg")
 
@@ -89,20 +90,22 @@ model Product {
 }
 
 model SupplierProducts {
-  id         String  @id @default(uuid())
-  supplierId String
-  productId  String
-  quantity   Decimal @default(0)
-  price      Decimal
+  id          String  @id @default(uuid())
+  supplierId  String
+  productId   String?
+  quantity    Decimal @default(0)
+  price       Decimal
+  priceForOne Decimal @default(0)
+  name        String  @default("Need to add name")
+  limit       Decimal @default(1000)
 
   supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product  Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   createAt   DateTime            @default(now())
   updatedAt  DateTime            @updatedAt
   orderItems SupplierOrderItem[]
 
-  @@unique([supplierId, productId])
   @@index([productId, supplierId])
 }
 
@@ -200,6 +203,7 @@ enum Role {
 enum ProductType {
   WEIGHT
   LIQUID
+  QUANTITY
 }
 
 enum OrderStatus {
