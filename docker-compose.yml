@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: fasshane
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - '8080:8080'

@@ -1,19 +1,29 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UseGuards,
+} from '@nestjs/common';
+import { JwtAuthGuard, RolesGuard } from 'src/common/guards';
 import { ProductService } from './product.service';
-import { Roles } from 'src/common/decorator';
+import { FileUploadInterceptor, Roles } from 'src/common/decorator';
 import { Role } from '@prisma/client';
-import { RolesGuard } from '../../common/guards/roles.guard';
-import { ProductCreateRequestDto } from './dto/request';
-import { ProductUpdateRequestDto } from './dto/request/product-update.request.dto';
+import {
+  ProductCreateRequestDto,
+  ProductUpdateRequestDto,
+} from './dto/request';
+import { Express } from 'express';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(Role.ADMIN, Role.MANAGER)
 @Controller('products')
 export class ProductController {
-
-  constructor(readonly service: ProductService) {
-  }
+  constructor(readonly service: ProductService) {}
 
   @Get('/all-select')
   getAllShort() {
@@ -31,14 +41,22 @@ export class ProductController {
   }
 
   @Post('')
-  create(@Body() product: ProductCreateRequestDto) {
-    console.log('product', product);
-    return this.service.createOne(product);
+  @FileUploadInterceptor()
+  async create(
+    @Body() body: ProductCreateRequestDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.service.createOne(body, file);
   }
 
   @Patch('/:id')
-  updateOne(@Param('id') id: string, @Body() product: ProductUpdateRequestDto) {
-    return this.service.updateOne(id, product);
+  @FileUploadInterceptor()
+  updateOne(
+    @Param('id') id: string,
+    @Body() product: ProductUpdateRequestDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.service.updateOne(id, product, file);
   }
 
   @Get('/:id')
