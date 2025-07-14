@@ -5,8 +5,7 @@ import { Product, ProductShort } from './dto/response';
 
 @Injectable()
 export class ProductRepository {
-  constructor(private prisma: PrismaService) {
-  }
+  constructor(private prisma: PrismaService) {}
 
   findAll(): Promise<Product[]> {
     return this.prisma.product.findMany({
@@ -36,7 +35,10 @@ export class ProductRepository {
     });
   }
 
-  updateOne(id: string, product: Prisma.ProductUpdateInput): Promise<ProductShort> {
+  updateOne(
+    id: string,
+    product: Prisma.ProductUpdateInput,
+  ): Promise<ProductShort> {
     return this.prisma.product.update({
       where: { id },
       data: product,

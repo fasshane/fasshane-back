@@ -1,4 +1,9 @@
-import { DoubleTransformDecorator, EnumDecorator, IsNotEmptyString } from 'src/common/decorator';
+import {
+  BooleanTransformDecorator,
+  DoubleTransformDecorator,
+  EnumDecorator,
+  IsNotEmptyString,
+} from 'src/common/decorator';
 import { ProductType } from '@prisma/client';
 
 export class ProductCreateRequestDto {
@@ -13,4 +18,7 @@ export class ProductCreateRequestDto {
 
   @IsNotEmptyString(true)
   image: string;
+
+  @BooleanTransformDecorator(true)
+  useDefaultImage: boolean;
 }

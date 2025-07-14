@@ -4,11 +4,20 @@ import { UserModule } from './modules/user/user.module';
 import { SupplierModule } from './modules/supplier/supplier.module';
 import { ProductModule } from './modules/product/product.module';
 import { MealModule } from './modules/meal/meal.module';
+import { MailModule } from './shared';
+import { S3Module } from './s3/s3.module';
 
 @Module({
-  imports: [AuthModule, UserModule, SupplierModule, ProductModule, MealModule],
+  imports: [
+    AuthModule,
+    UserModule,
+    SupplierModule,
+    ProductModule,
+    MealModule,
+    MailModule,
+    S3Module,
+  ],
   controllers: [],
   providers: [],
 })
-export class AppModule {
-}
+export class AppModule {}
