@@ -13,7 +13,7 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { SupplierService } from './supplier.service';
 import { Roles } from '../../common/decorator';
 import { Role } from '@prisma/client';
-import { RolesGuard } from '../../common/guards/roles.guard';
+import { RolesGuard } from '../../common/guards';
 import { SupplierCreateRequestDto, SupplierUpdateRequestDto } from './dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)

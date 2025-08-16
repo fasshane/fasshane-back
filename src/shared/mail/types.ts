@@ -20,3 +20,18 @@ export type SendProductMail = {
 };
 
 export type SendProductMailDto = {} & SendProductMail & SendMailDto;
+
+export type SendEmailActivationToken = {
+  token: string;
+  email: string;
+};
+
+export type SendMfaCode = {
+  code: string;
+  email: string;
+};
+
+export type SendPasswordResetCode = {
+  code: string;
+  email: string;
+};

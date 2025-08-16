@@ -63,7 +63,7 @@ export class ProductService {
         ? url.split('/').slice(3).join('/')
         : url;
       await this.s3.deleteFile(key);
-      this.logger.log('Product image deleted for id: ' + id);
+      this.logger.log('Зображення продукту видалено для id: ' + id);
     }
 
     product.image = newImageUrl;
@@ -76,7 +76,7 @@ export class ProductService {
   getOne(id: string) {
     const product = this.repository.findOne(id);
     if (!product) {
-      throw new NotFoundException('Product not found');
+      throw new NotFoundException('Продукт не знайдено');
     }
     return product;
   }

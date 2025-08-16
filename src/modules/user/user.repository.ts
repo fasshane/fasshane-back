@@ -6,8 +6,7 @@ import { UserResponseDto } from './dto/response/user.response.dto';
 
 @Injectable()
 export class UserRepository {
-  constructor(private prisma: PrismaService) {
-  }
+  constructor(private prisma: PrismaService) {}
 
   findUserByEmail(email: string): Promise<User> {
     return this.prisma.user.findUnique({
@@ -47,11 +46,24 @@ export class UserRepository {
     });
   }
 
-  changeStatusUserById(id: string, status: UserStatus): Promise<UserResponseDto> {
+  changeStatusUserById(
+    id: string,
+    status: UserStatus,
+  ): Promise<UserResponseDto> {
     return this.prisma.user.update({
       where: { id: id },
       data: { status: status },
       select: selectFields,
+    });
+  }
+
+  async updateUserPassword(
+    userId: string,
+    hashedPassword: string,
+  ): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
     });
   }
 }

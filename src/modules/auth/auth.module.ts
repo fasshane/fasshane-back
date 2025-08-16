@@ -3,11 +3,11 @@ import { PrismaService } from 'nestjs-prisma';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtGuardStrategy } from '../../common/strategies/jwt-auth.strategy';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
-import { GoogleStrategy } from '../../common/strategies/google-oauth.strategy';
+import { GoogleStrategy, JwtGuardStrategy } from '../../common/strategies';
+import { JwtAuthGuard } from '../../common/guards';
 import { UserModule } from '../user/user.module';
 import { env } from '../../config';
+import { MailModule } from '../../shared';
 
 @Module({
   imports: [
@@ -18,10 +18,15 @@ import { env } from '../../config';
       }),
     }),
     UserModule,
+    MailModule,
   ],
   controllers: [AuthController],
-  providers: [PrismaService, AuthService, JwtGuardStrategy, JwtAuthGuard, GoogleStrategy],
-
+  providers: [
+    PrismaService,
+    AuthService,
+    JwtGuardStrategy,
+    JwtAuthGuard,
+    GoogleStrategy,
+  ],
 })
-export class AuthModule {
-}
+export class AuthModule {}

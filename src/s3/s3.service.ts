@@ -28,7 +28,9 @@ export class S3Service {
 
   async uploadFile(file: Express.Multer.File, key: string) {
     if (file.size > env.FILE_MAX_SIZE_MB * 1024 * 1024) {
-      throw new BadRequestException('File size is too large');
+      throw new BadRequestException(
+        `Розмір файлу завеликий. Максимум: ${env.FILE_MAX_SIZE_MB} МБ`,
+      );
     }
     const bucket = env.S3_BUCKET;
     const input: PutObjectCommandInput = {
@@ -44,10 +46,10 @@ export class S3Service {
         return getAwsUrl(key);
       }
     } catch (error) {
-      this.logger.error('Error uploading file', error);
+      this.logger.error('Помилка під час завантаження файлу', error);
       throw error;
     }
-    throw new BadRequestException('Cannot upload file');
+    throw new BadRequestException('Не вдалося завантажити файл');
   }
 
   async deleteFile(key: string): Promise<boolean> {
@@ -60,8 +62,8 @@ export class S3Service {
       const response = await this.s3.send(command);
       return [200, 204].includes(response.$metadata.httpStatusCode ?? 0);
     } catch (error) {
-      this.logger.error('Error deleting file', error);
-      throw new BadRequestException('Cannot delete file');
+      this.logger.error('Помилка під час видалення файлу', error);
+      throw new BadRequestException('Не вдалося видалити файл');
     }
   }
 }

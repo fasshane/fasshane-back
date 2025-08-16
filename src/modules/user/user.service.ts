@@ -1,15 +1,17 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+} from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { UserResponseDto } from './dto/response/user.response.dto';
 import { CreateUserModel } from './dto/user.model';
 import * as bcrypt from 'bcryptjs';
 import { UserStatus } from '@prisma/client';
 
-
 @Injectable()
 export class UserService {
-  constructor(readonly userRepository: UserRepository) {
-  }
+  constructor(readonly userRepository: UserRepository) {}
 
   getAllUsers(): Promise<UserResponseDto[]> {
     return this.userRepository.findAllUsers();
@@ -18,7 +20,7 @@ export class UserService {
   async createUser(user: CreateUserModel) {
     const existingUser = await this.userRepository.findUserByEmail(user.email);
     if (existingUser) {
-      throw new ConflictException('User already exists');
+      throw new ConflictException('Користувач уже існує');
     }
     const hashedPassword = await bcrypt.hash(user.password, 10);
     return this.userRepository.createUser({
@@ -30,7 +32,7 @@ export class UserService {
   async deleteUser(id: string) {
     const user = await this.userRepository.findUserById(id);
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new BadRequestException('Користувача не знайдено');
     }
     return this.userRepository.deleteUserById(id);
   }
@@ -38,11 +40,12 @@ export class UserService {
   async changeStatusUser(id: string) {
     const user = await this.userRepository.findUserById(id);
     if (!user) {
-      throw new BadRequestException('User not found');
+      throw new BadRequestException('Користувача не знайдено');
     }
-    const status: UserStatus = user.status === UserStatus.ACTIVE
-      ? UserStatus.BLOCKED
-      : UserStatus.ACTIVE;
+    const status: UserStatus =
+      user.status === UserStatus.ACTIVE
+        ? UserStatus.BLOCKED
+        : UserStatus.ACTIVE;
     return this.userRepository.changeStatusUserById(id, status);
   }
 }
