@@ -5,16 +5,16 @@ const prisma = new PrismaClient();
 
 export const createProducts = async (suppliers) => {
   const productsData = [
-    { name: 'Tomato', type: ProductType.WEIGHT },
-    { name: 'Cheese', type: ProductType.WEIGHT },
-    { name: 'Bread', type: ProductType.WEIGHT },
-    { name: 'Lettuce', type: ProductType.WEIGHT },
-    { name: 'Chicken', type: ProductType.WEIGHT },
-    { name: 'Milk', type: ProductType.LIQUID },
-    { name: 'Olive Oil', type: ProductType.LIQUID },
-    { name: 'Eggs', type: ProductType.QUANTITY },
-    { name: 'Rice', type: ProductType.WEIGHT },
-    { name: 'Yogurt', type: ProductType.LIQUID },
+    { name: 'Помідори', type: ProductType.WEIGHT },
+    { name: 'Сир', type: ProductType.WEIGHT },
+    { name: 'Хліб', type: ProductType.WEIGHT },
+    { name: 'Салат', type: ProductType.WEIGHT },
+    { name: 'Курятина', type: ProductType.WEIGHT },
+    { name: 'Молоко', type: ProductType.LIQUID },
+    { name: 'Оливкова олія', type: ProductType.LIQUID },
+    { name: 'Яйця', type: ProductType.QUANTITY },
+    { name: 'Рис', type: ProductType.WEIGHT },
+    { name: 'Йогурт', type: ProductType.LIQUID },
   ];
 
   const tasks = [];

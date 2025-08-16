@@ -7,7 +7,7 @@ import {
 import { ProductType } from '@prisma/client';
 
 export class ProductCreateRequestDto {
-  @IsNotEmptyString(false, 'Name is required')
+  @IsNotEmptyString(false)
   name: string;
 
   @EnumDecorator(ProductType)

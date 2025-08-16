@@ -26,7 +26,7 @@ export class SupplierService {
   async getOne(id: string) {
     const supplier = await this.repository.findOneWithProducts(id);
     if (!supplier) {
-      throw new BadRequestException('Supplier not found');
+      throw new BadRequestException('Постачальника не знайдено');
     }
     return supplier;
   }

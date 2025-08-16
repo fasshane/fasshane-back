@@ -4,11 +4,6 @@ import { IsEnum, IsOptional } from 'class-validator';
 
 export function EnumDecorator(enumType: any, optional = false) {
   const decorators = [Expose(), IsEnum(enumType)];
-  optional
-    ? decorators.push(
-      IsOptional(),
-    )
-    : decorators.push(
-    );
+  optional ? decorators.push(IsOptional()) : decorators.push();
   return applyDecorators(...decorators);
 }

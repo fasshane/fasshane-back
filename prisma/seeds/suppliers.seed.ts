@@ -7,52 +7,52 @@ const getRandomBool = () => Math.random() < 0.5;
 export const createSuppliers = async () => {
   const suppliersData = [
     {
-      name: 'Fresh Organic Farms',
+      name: 'Свіжі Органічні Ферми',
       email: 'contact@freshorganicfarms.com',
       phone: '555-111-2222',
     },
     {
-      name: 'Urban Green Grocers',
+      name: 'Міські Зелені Продукти',
       email: 'info@urbangreengrocers.com',
       phone: '555-333-4444',
     },
     {
-      name: 'Earthly Produce Co.',
+      name: 'Земні Овочі Ко.',
       email: 'hello@earthlyproduce.com',
       phone: '555-555-6666',
     },
     {
-      name: 'Purely Fresh',
+      name: 'Суто Свіже',
       email: 'service@purelyfresh.com',
       phone: '555-777-8888',
     },
     {
-      name: 'Nature’s Bounty',
+      name: 'Щедрість Природи',
       email: 'contact@naturesbounty.com',
       phone: '555-999-0000',
     },
     {
-      name: 'Green Valley Farms',
+      name: 'Ферми Зеленої Долини',
       email: 'info@greenvalleyfarms.com',
       phone: '555-321-4321',
     },
     {
-      name: 'Organic Harvest',
+      name: 'Органічний Урожай',
       email: 'support@organicharvest.com',
       phone: '555-654-7654',
     },
     {
-      name: 'Sunny Acres Produce',
+      name: 'Сонячні Лани',
       email: 'contact@sunnyacresproduce.com',
       phone: '555-234-3456',
     },
     {
-      name: 'Herb Garden Supply',
+      name: 'Постачальник Трав’яного Саду',
       email: 'info@herbgardensupply.com',
       phone: '555-567-6789',
     },
     {
-      name: 'Farm Fresh Market',
+      name: 'Фермерський Ринок',
       email: 'hello@farmfreshmarket.com',
       phone: '555-876-9876',
     },

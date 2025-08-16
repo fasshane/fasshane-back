@@ -10,7 +10,10 @@ import {
   IsUUID,
   registerDecorator,
 } from 'class-validator';
-import { transformToBoolean, transformToDate } from 'src/common/function/common';
+import {
+  transformToBoolean,
+  transformToDate,
+} from 'src/common/function/common';
 
 export function UuidDecorator(optional = false) {
   const decorators = [IsString(), IsUUID(), IsNotEmpty(), Expose()];
@@ -64,7 +67,7 @@ export function DoubleTransformDecorator(optional = false) {
   return applyDecorators(...decorators);
 }
 
-export function DoubleDecorator(optional = false, example = 10.25) {
+export function DoubleDecorator(optional = false) {
   const decorators = [IsDouble()];
   if (optional) {
     decorators.push(IsOptional());
@@ -73,7 +76,7 @@ export function DoubleDecorator(optional = false, example = 10.25) {
 }
 
 export function IsDouble() {
-  return function(object: object, propertyName: string) {
+  return function (object: object, propertyName: string) {
     registerDecorator({
       name: 'isDouble',
       target: object.constructor,
@@ -84,7 +87,7 @@ export function IsDouble() {
           return /^\d+(\.\d{1,2})?$/.test(value.toString());
         },
         defaultMessage() {
-          return 'Amount must be a valid double with up to 2 decimal places';
+          return 'Сума має бути числом з десятковою крапкою і не більше ніж 2 знаки після коми';
         },
       },
     });
@@ -104,10 +107,8 @@ export function DateDecorator(optional = false) {
   return applyDecorators(...decorators);
 }
 
-export function IsNotEmptyString(optional = false, example = 'string') {
+export function IsNotEmptyString(optional = false) {
   const decorators = [IsString()];
-  optional
-    ? decorators.push(IsOptional())
-    : decorators.push(IsNotEmpty());
+  optional ? decorators.push(IsOptional()) : decorators.push(IsNotEmpty());
   return applyDecorators(...decorators);
 }

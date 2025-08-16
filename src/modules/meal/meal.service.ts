@@ -3,11 +3,9 @@ import { MealRepository } from './meal.repository';
 import { MealResponseDto } from './dto/response/meal.response.dto';
 import { MealCreateRequestDto } from './dto/meal-create.request.dto';
 
-
 @Injectable()
 export class MealService {
-  constructor(readonly mealRepository: MealRepository) {
-  }
+  constructor(readonly mealRepository: MealRepository) {}
 
   async getAllMeals(): Promise<MealResponseDto[]> {
     const meals = await this.mealRepository.getAllMeals();
@@ -32,11 +30,14 @@ export class MealService {
   async updatedMeal(id: string, mealUpdateDto: MealCreateRequestDto) {
     const oldMeal = await this.mealRepository.getMealById(id);
     if (oldMeal == null) return;
-    return await this.mealRepository.updatedMeal(id, mealUpdateDto, oldMeal.ingredients);
+    return await this.mealRepository.updatedMeal(
+      id,
+      mealUpdateDto,
+      oldMeal.ingredients,
+    );
   }
 
   async deleteMeal(id: string) {
     return await this.mealRepository.deleteMeal(id);
   }
-  
 }
