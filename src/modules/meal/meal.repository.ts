@@ -5,13 +5,14 @@ import { MealCreateRequestDto } from './dto/meal-create.request.dto';
 
 @Injectable()
 export class MealRepository {
-  constructor(private prisma: PrismaService) {
-  }
+  constructor(private prisma: PrismaService) {}
 
-  async getAllMeals(): Promise<(Meal & {
-    ingredients: { product: { name: string; id: string; } }[];
-  })[]> {
-    return await this.prisma.meal.findMany({
+  async getAllMeals(): Promise<
+    (Meal & {
+      ingredients: { product: { name: string; id: string } }[];
+    })[]
+  > {
+    return this.prisma.meal.findMany({
       include: {
         ingredients: {
           select: { product: true },
@@ -21,14 +22,14 @@ export class MealRepository {
   }
 
   async getMealById(id: string): Promise<Meal & { ingredients: Ingredient[] }> {
-    return await this.prisma.meal.findUnique({
+    return this.prisma.meal.findUnique({
       where: { id },
       include: { ingredients: true },
     });
   }
 
   async createMeal(mealCreateDto: MealCreateRequestDto) {
-    return await this.prisma.meal.create({
+    return this.prisma.meal.create({
       data: {
         name: mealCreateDto.name,
         description: mealCreateDto.description,
@@ -43,28 +44,36 @@ export class MealRepository {
     });
   }
 
-  async updatedMeal(id: string, mealUpdateDto: MealCreateRequestDto, previousIngredients: Ingredient[]) {
+  async updatedMeal(
+    id: string,
+    mealUpdateDto: MealCreateRequestDto,
+    previousIngredients: Ingredient[],
+  ) {
     const newIngredients = mealUpdateDto.ingredients;
 
-    const newProductIds = newIngredients.map((ingredient) => ingredient.productId);
+    const newProductIds = newIngredients.map(
+      (ingredient) => ingredient.productId,
+    );
 
     const ingredientsToDelete = previousIngredients.filter(
-      (ingredient) => !newProductIds.includes(ingredient.productId)
+      (ingredient) => !newProductIds.includes(ingredient.productId),
     );
 
     const ingredientsToCreate = newIngredients.filter(
-      (newIngredient) => !previousIngredients.some(
-        (oldIngredient) => oldIngredient.productId === newIngredient.productId
-      )
+      (newIngredient) =>
+        !previousIngredients.some(
+          (oldIngredient) =>
+            oldIngredient.productId === newIngredient.productId,
+        ),
     );
 
     const ingredientsToUpdate = newIngredients.filter((newIngredient) =>
       previousIngredients.some(
-        (oldIngredient) => oldIngredient.productId === newIngredient.productId
-      )
+        (oldIngredient) => oldIngredient.productId === newIngredient.productId,
+      ),
     );
 
-    return await this.prisma.$transaction([
+    return this.prisma.$transaction([
       this.prisma.ingredient.deleteMany({
         where: {
           id: {
@@ -87,7 +96,10 @@ export class MealRepository {
 
             update: ingredientsToUpdate.map((ingredient) => ({
               where: {
-                id: previousIngredients.find((oldIngredient) => oldIngredient.productId === ingredient.productId)?.id,
+                id: previousIngredients.find(
+                  (oldIngredient) =>
+                    oldIngredient.productId === ingredient.productId,
+                )?.id,
               },
               data: {
                 quantity: ingredient.quantity,
@@ -100,7 +112,7 @@ export class MealRepository {
   }
 
   async deleteMeal(id: string) {
-    return await this.prisma.$transaction([
+    return this.prisma.$transaction([
       this.prisma.ingredient.deleteMany({
         where: { mealId: id },
       }),

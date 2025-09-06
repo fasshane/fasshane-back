@@ -1,17 +1,25 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { UserService } from './user.service';
 import { CreateUserModel } from './dto/user.model';
-import { Roles } from '../../common/decorator/roles.decorator';
+import { Roles } from '../../common/decorator';
 import { Role } from '@prisma/client';
-import { RolesGuard } from '../../common/guards/roles.guard';
+import { RolesGuard } from '../../common/guards';
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
-
-  constructor(readonly userService: UserService) {
-  }
+  constructor(readonly userService: UserService) {}
 
   @Get('/me')
   async getMe(@Req() req) {

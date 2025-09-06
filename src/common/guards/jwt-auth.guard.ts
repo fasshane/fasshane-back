@@ -16,7 +16,9 @@ export class JwtAuthGuard implements CanActivate {
     const authHeader = request.headers['authorization'];
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedException('Token is missing or invalid');
+      throw new UnauthorizedException(
+        'Токен відсутній або має некоректний формат',
+      );
     }
 
     const token = authHeader.split(' ')[1];
@@ -26,8 +28,8 @@ export class JwtAuthGuard implements CanActivate {
         secret: env.JWT_SECRET,
       });
       return true;
-    } catch (error) {
-      throw new UnauthorizedException('Invalid or expired token');
+    } catch {
+      throw new UnauthorizedException('Недійсний або прострочений токен');
     }
   }
 }
