@@ -17,8 +17,9 @@ import { OrderModule } from './modules/order/order.module';
     MealModule,
     MailModule,
     S3Module,
-  , OrderModule],
+    OrderModule,
+  ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

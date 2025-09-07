@@ -19,10 +19,10 @@ export class OrderRepository {
         });
     }
 
-    async createOrderByCashier(customerId: string, dto: OrderCreateDto): Promise<CustomerOrder> {
+    async createOrderByCashier(cashierId: string, dto: OrderCreateDto): Promise<{ id: string }> {
         const order = await this.prisma.customerOrder.create({
             data: {
-                customerId,
+                cashierId,
                 totalPrice: dto.totalPrice,
                 status: CustomerOrderStatus.INITIAL,
                 items: {
@@ -42,7 +42,7 @@ export class OrderRepository {
             },
         });
 
-        return order;
+        return { id: order.id };
     }
 
     async addItemToOrder(orderId: string, mealId: string, quantity = 1) {

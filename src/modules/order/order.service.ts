@@ -3,10 +3,11 @@ import { OrderRepository } from "./order.repository";
 import { CustomerOrder } from "@prisma/client";
 import { OrderUpdateDto } from "./dto/request/order-update.dto";
 import { OrderCreateDto } from "./dto/request/order-create.dto";
+import { MealRepository } from "../meal/meal.repository";
 
 @Injectable()
 export class OrderService {
-  constructor(private orderRepository: OrderRepository) { }
+  constructor(private orderRepository: OrderRepository, private mealRepository: MealRepository) { }
 
   // async getCustomerOrder(customerId: string) {
   //   return await this.orderRepository.getCustomerOrder(customerId);
@@ -16,8 +17,12 @@ export class OrderService {
     return await this.orderRepository.createOrder(customerId);
   }
 
-  async createOrderByCashier(customerId: string, dto: OrderCreateDto) {
-    return await this.orderRepository.createOrderByCashier(customerId, dto);
+  async createOrderByCashier(cashierId: string, dto: OrderCreateDto) {
+    const orderItemsMap = new Map(dto.items.map(i => [i.id, i]));
+    const meals = await this.mealRepository.getMealsByIds( Array.from(orderItemsMap.keys()));
+    const totalPrice = meals.reduce((a, b) => a + b.price.toNumber() * orderItemsMap.get(b.id).quantity, 0);
+
+    return await this.orderRepository.createOrderByCashier(cashierId, {...dto, totalPrice: totalPrice});
   }
 
   // async addItemToOrder(customerId: string, productId: string, quantity = 1) {

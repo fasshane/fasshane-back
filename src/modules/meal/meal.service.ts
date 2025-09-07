@@ -16,6 +16,7 @@ export class MealService {
       description: meal.description,
       mealProducts: meal.ingredients.map((mp) => mp.product.name),
       image: meal.image,
+      price: meal.price.toNumber(),
     }));
   }
 

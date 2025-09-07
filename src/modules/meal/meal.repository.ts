@@ -28,6 +28,16 @@ export class MealRepository {
     });
   }
 
+async getMealsByIds(ids: string[]): Promise<Meal[]> {
+  return this.prisma.meal.findMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+  });
+}
+
   async createMeal(mealCreateDto: MealCreateRequestDto) {
     return this.prisma.meal.create({
       data: {

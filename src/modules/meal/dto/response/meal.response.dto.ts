@@ -3,4 +3,5 @@ export type MealResponseDto = {
   name: string;
   description: string;
   mealProducts: string[];
+  price: number,
 }
