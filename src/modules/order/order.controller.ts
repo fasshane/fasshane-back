@@ -49,10 +49,10 @@ export class OrderController {
     return this.orderService.updateOrder(dto);
   }
 
-  @Patch('payOrder')
-  async payOrder(@Body() dto: { orderId: string }) {
-    console.log("orderId: ", dto.orderId);
-    return this.orderService.payOrder(dto.orderId);
+  @Post('payOrder')
+  async payOrder(@Req() req, @Body() dto: OrderCreateDto) {
+    const customerId = req.user.id;
+    return this.orderService.payOrder({...dto, customerId});
   }
 
   // @Get()

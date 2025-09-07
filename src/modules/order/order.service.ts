@@ -52,8 +52,8 @@ console.log('order id: ', order.id)
     return await this.orderRepository.updateOrder(dto);
   }
 
-  async payOrder(orderId: string) {
-    return await this.orderRepository.payOrder(orderId);
+  async payOrder(order: OrderCreateDto) {
+    return await this.orderRepository.payOrder(order);
   }
 
   // async removeItemFromOrder(customerId: string, productId: string) {

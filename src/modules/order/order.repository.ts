@@ -197,20 +197,30 @@ export class OrderRepository {
         return { message: 'Order updated successfully' };
     }
 
-    async payOrder(orderId: string) {
-        // return await this.prisma.customerOrder.update({
-        //     where: { id: orderId },
-        //     data: { status: CustomerOrderStatus.SUCCESS },
-        // });
-        try {
-            return await this.prisma.customerOrder.update({
-                where: { id: orderId },
-                data: { status: CustomerOrderStatus.SUCCESS },
-            });
-        } catch (error) {
-            console.error("Error updating order status:", error);
-            throw new Error("Could not update order status");
-        }
+    async payOrder(orderDto: OrderCreateDto) {
+        const order = await this.prisma.customerOrder.create({
+            data: {
+                customerId: orderDto.customerId,
+                totalPrice: orderDto.totalPrice,
+                status: CustomerOrderStatus.INITIAL,
+                items: {
+                    create: orderDto.items.map((item: OrderItemDto) => ({
+                        quantity: item.quantity,
+                        price: item.price,
+                        mealId: item.meal.id,
+                    })),
+                },
+            },
+            include: {
+                items: {
+                    include: {
+                        meal: true,
+                    },
+                },
+            },
+        });
+
+        return { id: order.id };
     }
 
     private async calculateMealPrice(mealId: string): Promise<number> {
