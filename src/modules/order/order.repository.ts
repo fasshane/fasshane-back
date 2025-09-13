@@ -202,7 +202,7 @@ export class OrderRepository {
             data: {
                 customerId: orderDto.customerId,
                 totalPrice: orderDto.totalPrice,
-                status: CustomerOrderStatus.INITIAL,
+                status: CustomerOrderStatus.SUCCESS,
                 items: {
                     create: orderDto.items.map((item: OrderItemDto) => ({
                         quantity: item.quantity,
