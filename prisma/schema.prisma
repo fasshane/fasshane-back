@@ -16,10 +16,12 @@ model User {
   role     Role
   status   UserStatus @default(ACTIVE)
   googleId String?    @unique
+  CustomerOrder CustomerOrder[]
 
   admin    Admin?
   customer Customer?
   manager  Manager?
+  cashier  Cashier?
 
   isVerified        Boolean               @default(false)
   createAt          DateTime              @default(now())
@@ -72,8 +74,8 @@ model Customer {
   points Int    @default(0)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createAt      DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
 }
 
 model Manager {
@@ -91,6 +93,18 @@ model Admin {
   userId      String @unique
   permissions String
   user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Cashier {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  register  String?  // cash register ID or workplace
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orders    CustomerOrder[] // Orders created by this cashier
 
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -197,9 +211,71 @@ model Meal {
   description String?
   image       String?
   ingredients Ingredient[]
+  price       Decimal      @default(0)
+
+  createAt          DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  CustomerOrderItem CustomerOrderItem[]
+}
+
+model CustomerOrder {
+  id         String              @id @default(uuid())
+  customerId String?             
+  cashierId  String?             
+  status     CustomerOrderStatus @default(INITIAL)
+  totalPrice Decimal             @default(0)
+
+  customer   User?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  cashier    Cashier? @relation(fields: [cashierId], references: [id], onDelete: SetNull)
+
+  items      CustomerOrderItem[]
+  bill       Bill?   @relation(fields: [billId], references: [id])
+  billId     String?
 
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([status, customerId])
+}
+
+
+model CustomerOrderItem {
+  id       String  @id @default(uuid())
+  orderId  String
+  mealId   String
+  quantity Int     @default(1)
+  price    Decimal // price per one unit at time of order
+
+  order CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  meal  Meal          @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Bill      Bill?
+
+  @@index([orderId, mealId])
+  @@unique([orderId, mealId])
+}
+
+model Bill {
+  id      String        @id @default(uuid())
+  orderId String        @unique
+  paid    Boolean       @default(false)
+  method  PaymentMethod
+  paidAt  DateTime?
+
+  order CustomerOrderItem @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  createAt      DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  CustomerOrder CustomerOrder[]
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TERMINAL
+  ONLINE
 }
 
 enum UserStatus {
@@ -211,6 +287,7 @@ enum Role {
   CUSTOMER
   MANAGER
   ADMIN
+  CASHIER
 }
 
 enum ProductType {
@@ -223,6 +300,13 @@ enum OrderStatus {
   INITIAL
   IN_PROGRESS
   DELIVERED
+  CANCELLED
+  FAILED
+}
+
+enum CustomerOrderStatus {
+  INITIAL
+  SUCCESS
   CANCELLED
   FAILED
 }
