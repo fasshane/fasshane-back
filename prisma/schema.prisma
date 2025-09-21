@@ -8,14 +8,14 @@ datasource db {
 }
 
 model User {
-  id       String     @id @default(uuid())
-  email    String     @unique
-  password String?
-  avatar   String?    @default("https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png")
-  name     String
-  role     Role
-  status   UserStatus @default(ACTIVE)
-  googleId String?    @unique
+  id            String          @id @default(uuid())
+  email         String          @unique
+  password      String?
+  avatar        String?         @default("https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png")
+  name          String
+  role          Role
+  status        UserStatus      @default(ACTIVE)
+  googleId      String?         @unique
   CustomerOrder CustomerOrder[]
 
   admin    Admin?
@@ -74,8 +74,8 @@ model Customer {
   points Int    @default(0)
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createAt      DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  createAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Manager {
@@ -99,12 +99,12 @@ model Admin {
 }
 
 model Cashier {
-  id        String   @id @default(uuid())
-  userId    String   @unique
-  register  String?  // cash register ID or workplace
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id       String  @id @default(uuid())
+  userId   String  @unique
+  register String? // cash register ID or workplace
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  orders    CustomerOrder[] // Orders created by this cashier
+  orders CustomerOrder[] // Orders created by this cashier
 
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -220,24 +220,23 @@ model Meal {
 
 model CustomerOrder {
   id         String              @id @default(uuid())
-  customerId String?             
-  cashierId  String?             
+  customerId String?
+  cashierId  String?
   status     CustomerOrderStatus @default(INITIAL)
   totalPrice Decimal             @default(0)
 
-  customer   User?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
-  cashier    Cashier? @relation(fields: [cashierId], references: [id], onDelete: SetNull)
+  customer User?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
+  cashier  Cashier? @relation(fields: [cashierId], references: [id], onDelete: SetNull)
 
-  items      CustomerOrderItem[]
-  bill       Bill?   @relation(fields: [billId], references: [id])
-  billId     String?
+  items  CustomerOrderItem[]
+  bill   Bill?               @relation(fields: [billId], references: [id])
+  billId String?
 
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([status, customerId])
 }
-
 
 model CustomerOrderItem {
   id       String  @id @default(uuid())
@@ -253,8 +252,8 @@ model CustomerOrderItem {
   updatedAt DateTime @updatedAt
   Bill      Bill?
 
-  @@index([orderId, mealId])
   @@unique([orderId, mealId])
+  @@index([orderId, mealId])
 }
 
 model Bill {
@@ -269,6 +268,47 @@ model Bill {
   createAt      DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   CustomerOrder CustomerOrder[]
+}
+
+model FeedbackContact {
+  id          String   @id @default(uuid())
+  name        String?
+  email       String?  @unique
+  phoneE164   String   @unique
+  phoneRegion String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  feedbacks Feedback[]
+}
+
+model Feedback {
+  id            String  @id @default(uuid())
+  ratingFood    Int
+  ratingService Int
+  comment       String? @db.Text
+
+  // антидубль із фронта
+  visitorId  String @db.VarChar(64)
+  deviceHash String @db.VarChar(128)
+
+  // антидубль/аналітика із бека
+  ipHash String @db.VarChar(64)
+  uaHash String @db.VarChar(64)
+
+  // ключ періоду (місяць/тиждень/forever)
+  periodKey String @db.VarChar(20)
+
+  status    FeedbackStatus @default(PENDING)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  contactId String
+  contact   FeedbackContact @relation(fields: [contactId], references: [id])
+
+  @@unique([visitorId, periodKey], map: "uniq_feedback_visitor_period")
+  @@unique([deviceHash, periodKey], map: "uniq_feedback_device_period")
+  @@index([ipHash, uaHash, createdAt], map: "idx_feedback_ipua_time")
 }
 
 enum PaymentMethod {
@@ -309,4 +349,11 @@ enum CustomerOrderStatus {
   SUCCESS
   CANCELLED
   FAILED
+}
+
+enum FeedbackStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+  SPAM
 }
