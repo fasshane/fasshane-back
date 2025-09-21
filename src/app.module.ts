@@ -7,6 +7,7 @@ import { MealModule } from './modules/meal/meal.module';
 import { MailModule } from './shared';
 import { S3Module } from './s3/s3.module';
 import { OrderModule } from './modules/order/order.module';
+import { FeedbackModule } from './modules/feedback';
 
 @Module({
   imports: [
@@ -18,8 +19,9 @@ import { OrderModule } from './modules/order/order.module';
     MailModule,
     S3Module,
     OrderModule,
+    FeedbackModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}
