@@ -37,6 +37,7 @@
     "multer": "2.0.2",
     "multer-s3": "^3.0.1",
     "nestjs-prisma": "^0.25.0",
+    "node-fpgrowth": "^1.2.1",
     "nodemailer": "^7.0.4",
     "passport": "^0.7.0",
     "passport-google-oauth2": "^0.2.0",
