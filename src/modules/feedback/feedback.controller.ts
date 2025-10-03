@@ -1,7 +1,8 @@
-import { Body, Controller, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
 import { Request } from 'express';
-import { CreateFeedbackDto } from './dto';
+import { CreateFeedbackDto, FeedbackResponseDto } from './dto';
+import { StaffOnly } from '../../common/decorator';
 
 @Controller('feedback')
 export class FeedbackController {
@@ -13,5 +14,11 @@ export class FeedbackController {
     return {
       success: true,
     };
+  }
+
+  @StaffOnly()
+  @Get()
+  async getAll(): Promise<FeedbackResponseDto[]> {
+    return this.service.getAll();
   }
 }

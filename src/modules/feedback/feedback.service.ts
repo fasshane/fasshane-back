@@ -1,7 +1,7 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { getClientIp, makePeriodKey, sha256 } from 'src/shared/utils';
-import { CreateFeedbackDto } from './dto';
+import { CreateFeedbackDto, FeedbackResponseDto } from './dto';
 import { PrismaService } from 'nestjs-prisma';
 
 @Injectable()
@@ -49,5 +49,12 @@ export class FeedbackService {
         throw new ConflictException('Ви вже залишали відгук у цей період.');
       throw e;
     }
+  }
+
+  async getAll(): Promise<FeedbackResponseDto[]> {
+    const feedbacks = await this.prisma.feedback.findMany({
+      include: { contact: true },
+    });
+    return FeedbackResponseDto.mappingFromDto(feedbacks);
   }
 }
