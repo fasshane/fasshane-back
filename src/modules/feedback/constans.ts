@@ -6,6 +6,7 @@ export const FEEDBACK_STATUS_UA: Record<FeedbackStatus, string> = {
   IN_BACKLOG: 'У беклозі',
   IN_PROGRESS: 'У роботі',
   RESOLVED: 'Вирішено',
+  REVIEWED: 'Переглянуто',
   WONT_FIX: 'Не виправлятиметься',
   DUPLICATE: 'Дублікат',
 };
@@ -16,6 +17,7 @@ export const FEEDBACK_STATUS_HINT_UA: Record<FeedbackStatus, string> = {
   IN_BACKLOG: 'Поставлено в чергу на подальшу роботу',
   IN_PROGRESS: 'Над завданням вже працюють',
   RESOLVED: 'Проблему вирішено / ідею реалізовано',
+  REVIEWED: 'Відгук переглянуто',
   WONT_FIX: 'Свідоме рішення не робити змін',
   DUPLICATE: 'Поєднати з існуючим зверненням',
 };

@@ -3,6 +3,7 @@ import { Request } from 'express';
 import { getClientIp, makePeriodKey, sha256 } from 'src/shared/utils';
 import { CreateFeedbackDto, FeedbackResponseDto } from './dto';
 import { PrismaService } from 'nestjs-prisma';
+import { UpdateFeedbackDto } from './dto/update-status-feedback.dto.request';
 
 @Injectable()
 export class FeedbackService {
@@ -56,5 +57,15 @@ export class FeedbackService {
       include: { contact: true },
     });
     return FeedbackResponseDto.mappingFromDto(feedbacks);
+  }
+
+  async updateStatus(dto: UpdateFeedbackDto) {
+    const feedback = await this.prisma.feedback.update({
+      where: { id: dto.feedbackId },
+      data: { status: dto.status },
+      include: { contact: true },
+    });
+
+    return FeedbackResponseDto.fromDtoToResponseDto(feedback);
   }
 }

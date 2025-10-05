@@ -1,8 +1,9 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Req } from '@nestjs/common';
 import { FeedbackService } from './feedback.service';
 import { Request } from 'express';
 import { CreateFeedbackDto, FeedbackResponseDto } from './dto';
 import { StaffOnly } from '../../common/decorator';
+import { UpdateFeedbackDto } from './dto/update-status-feedback.dto.request';
 
 @Controller('feedback')
 export class FeedbackController {
@@ -20,5 +21,13 @@ export class FeedbackController {
   @Get()
   async getAll(): Promise<FeedbackResponseDto[]> {
     return this.service.getAll();
+  }
+
+  @StaffOnly()
+  @Patch('/status')
+  async updateStatus(
+    @Body() dto: UpdateFeedbackDto,
+  ): Promise<FeedbackResponseDto> {
+    return this.service.updateStatus(dto);
   }
 }

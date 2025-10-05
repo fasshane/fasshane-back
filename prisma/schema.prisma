@@ -357,6 +357,7 @@ enum FeedbackStatus {
   IN_BACKLOG
   IN_PROGRESS
   RESOLVED
+  REVIEWED
   WONT_FIX
   DUPLICATE
 }
