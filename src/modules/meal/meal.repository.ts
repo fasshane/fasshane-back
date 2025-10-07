@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { Ingredient, Meal } from '@prisma/client';
+import { Ingredient, Location, Meal, MealCategory } from '@prisma/client';
 import { PrismaService } from 'nestjs-prisma';
 import { MealCreateRequestDto } from './dto/meal-create.request.dto';
 
 @Injectable()
 export class MealRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async getAllMeals(): Promise<
     (Meal & {
@@ -17,6 +17,34 @@ export class MealRepository {
         ingredients: {
           select: { product: true },
         },
+        locations: true,
+        category: true
+      },
+    });
+  }
+
+  async getMealsByLocation(locationSlug: string): Promise<
+    (Meal & {
+      ingredients: { product: { name: string; id: string } }[];
+      category: MealCategory;
+      locations: { locationId: string, available: boolean }[];
+    })[]
+  > {
+    return this.prisma.meal.findMany({
+      where: {
+        locations: {
+          some: {
+            location: { slug: locationSlug },
+            available: true,
+          }
+        },
+      },
+      include: {
+        ingredients: {
+          select: { product: true },
+        },
+        locations: true,
+        category: true
       },
     });
   }
@@ -28,15 +56,15 @@ export class MealRepository {
     });
   }
 
-async getMealsByIds(ids: string[]): Promise<Meal[]> {
-  return this.prisma.meal.findMany({
-    where: {
-      id: {
-        in: ids,
+  async getMealsByIds(ids: string[]): Promise<Meal[]> {
+    return this.prisma.meal.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
       },
-    },
-  });
-}
+    });
+  }
 
   async createMeal(mealCreateDto: MealCreateRequestDto) {
     return this.prisma.meal.create({

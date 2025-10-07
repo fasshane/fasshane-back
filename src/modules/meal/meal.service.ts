@@ -7,17 +7,18 @@ import { MealCreateRequestDto } from './dto/meal-create.request.dto';
 export class MealService {
   constructor(readonly mealRepository: MealRepository) {}
 
-  async getAllMeals(): Promise<MealResponseDto[]> {
-    const meals = await this.mealRepository.getAllMeals();
-    return meals.map((meal) => ({
-      // TODO: maybe make the mappers
-      id: meal.id,
-      name: meal.name,
-      description: meal.description,
-      mealProducts: meal.ingredients.map((mp) => mp.product.name),
-      image: meal.image,
-      price: meal.price.toNumber(),
-    }));
+  async getAllMeals() {
+    // const meals = await this.mealRepository.getAllMeals();
+    // return meals.map((meal) => ({
+    //   // TODO: maybe make the mappers
+    //   id: meal.id,
+    //   name: meal.name,
+    //   description: meal.description,
+    //   mealProducts: meal.ingredients.map((mp) => mp.product.name),
+    //   image: meal.image,
+    //   price: meal.price.toNumber(),
+    // }));
+    return await this.mealRepository.getAllMeals();
   }
 
   async getMealById(id: string) {
@@ -40,5 +41,9 @@ export class MealService {
 
   async deleteMeal(id: string) {
     return await this.mealRepository.deleteMeal(id);
+  }
+
+  async getMealsByLocation(locationSlug: string) {
+    return await this.mealRepository.getMealsByLocation(locationSlug);
   }
 }
