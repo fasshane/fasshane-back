@@ -11,13 +11,12 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { SupplierService } from './supplier.service';
-import { Roles } from '../../common/decorator';
-import { Role } from '@prisma/client';
+import { StaffOnly } from '../../common/decorator';
 import { RolesGuard } from '../../common/guards';
 import { SupplierCreateRequestDto, SupplierUpdateRequestDto } from './dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(Role.ADMIN, Role.MANAGER)
+@StaffOnly()
 @Controller('suppliers')
 export class SupplierController {
   constructor(readonly service: SupplierService) {}
