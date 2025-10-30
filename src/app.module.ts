@@ -8,6 +8,8 @@ import { MailModule } from './shared';
 import { S3Module } from './s3/s3.module';
 import { OrderModule } from './modules/order/order.module';
 import { FeedbackModule } from './modules/feedback';
+import { LocationModule } from './modules/location/location.module';
+import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { FeedbackModule } from './modules/feedback';
     S3Module,
     OrderModule,
     FeedbackModule,
+    LocationModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],

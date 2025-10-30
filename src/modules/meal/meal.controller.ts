@@ -24,6 +24,11 @@ export class MealController {
     return this.mealService.getAllMeals();
   }
 
+  @Get('/location')
+  async getMealsByLocation(@Query('slug') locationSlug: string) {
+    return this.mealService.getMealsByLocation(locationSlug);
+  }
+
   @Get()
   async getMeal(@Query('id') id: string) {
     return this.mealService.getMealById(id);

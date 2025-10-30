@@ -24,7 +24,6 @@ export const createProducts = async (suppliers) => {
 
     const quantity = getRandomInt(1, 100);
     const priceForOne = parseFloat(getRandomFloat(0.5, 10).toFixed(2));
-    console.log('priceForOne', priceForOne);
     const price = parseFloat((priceForOne * quantity).toFixed(2));
     const limit = getRandomInt(50, 1000);
 

@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 import { createSuppliers } from './suppliers.seed';
 import { createProducts } from './products.seed';
 import { createMeals } from './meals.seed';
+import { createCategories } from './categories';
+import { createLocations } from './locations.seed';
 
 const prisma = new PrismaClient();
 
@@ -12,8 +14,12 @@ async function main() {
   // Create products
   const products = await createProducts(suppliers);
 
+  const categories = await createCategories();
+  
+  const locations = await createLocations();
+
   // Create meals
-  await createMeals(products);
+  await createMeals(products, categories, locations);
 
   console.log('✅ Seed data created successfully!');
 }
