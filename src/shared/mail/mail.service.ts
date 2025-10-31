@@ -46,7 +46,6 @@ export class MailService {
       return false;
     }
     await this.transporter.sendMail({
-      from: `"Fasshane" <${env.EMAIL_USER}>`,
       to,
       subject,
       html: htmlTemplate,
@@ -56,7 +55,6 @@ export class MailService {
 
   async sendEmailActivationToken({ token, email }: SendEmailActivationToken) {
     await this.transporter.sendMail({
-      from: `"Fasshane" <${env.EMAIL_USER}>`,
       to: email,
       subject: 'Підтвердження електронної пошти',
       html: getHtmlEmailActivation(
@@ -67,7 +65,6 @@ export class MailService {
 
   async sendMfaCode({ code, email }: SendMfaCode) {
     await this.transporter.sendMail({
-      from: `"Fasshane" <${env.EMAIL_USER}>`,
       to: email,
       subject: 'Ваш код підтвердження',
       html: getHtmlMfaCode(code),
@@ -76,7 +73,6 @@ export class MailService {
 
   async sendPasswordResetCode({ code, email }: SendPasswordResetCode) {
     await this.transporter.sendMail({
-      from: `"Fasshane" <${env.EMAIL_USER}>`,
       to: email,
       subject: 'Код для відновлення пароля',
       html: getHtmlPasswordResetCode(code),
