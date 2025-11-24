@@ -1,16 +1,15 @@
 import { Module } from '@nestjs/common';
 import { SupplierRepository } from './supplier.repository';
 import { PrismaService } from 'nestjs-prisma';
-import { JwtService } from '@nestjs/jwt';
 import { SupplierController } from './supplier.controller';
 import { SupplierService } from './supplier.service';
 import { ProductModule } from '../product/product.module';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [ProductModule],
+  imports: [ProductModule, AuthModule],
   exports: [SupplierRepository, SupplierService],
-  providers: [SupplierRepository, PrismaService, JwtService, SupplierService],
+  providers: [SupplierRepository, PrismaService, SupplierService],
   controllers: [SupplierController],
 })
-export class SupplierModule {
-}
+export class SupplierModule {}

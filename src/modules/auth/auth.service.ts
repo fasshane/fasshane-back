@@ -2,12 +2,11 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRepository } from '../user/user.repository';
 import { CreateUserModel } from '../user/dto/user.model';
-import { Role } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import {
   MfaRequestDto,
   PasswordResetDto,
@@ -30,10 +29,9 @@ export class AuthService {
     private mail: MailService,
   ) {}
 
-  // TODO: add type to userData
   async oAuthLogin(userData) {
     if (!userData) {
-      throw new Error('Дані користувача не надано!');
+      throw new BadRequestException('Дані користувача не надано!');
     }
 
     let user: UserResponseDto = await this.userRepository.findUserByEmail(
@@ -87,15 +85,23 @@ export class AuthService {
   }
 
   async login(email: string, password: string) {
-    const user = await this.userRepository.findUserByEmail(email);
+    const user: User = await this.userRepository.findUserByEmail(email);
+
     if (!user) {
-      throw new UnauthorizedException('Невірні облікові дані');
+      throw new BadRequestException('Невірні облікові дані');
     }
+
+    if (user.status === 'BLOCKED') {
+      throw new BadRequestException('Користувач заблокований');
+    }
+
     if (!user.isVerified) {
-      throw new UnauthorizedException('Користувач не підтвердив email');
+      throw new BadRequestException('Користувач не підтвердив email');
     }
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new UnauthorizedException('Невірні облікові дані');
+
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new BadRequestException('Невірні облікові дані');
+    }
 
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
@@ -136,7 +142,9 @@ export class AuthService {
     code,
   }: MfaRequestDto): Promise<{ token: string }> {
     const user = await this.userRepository.findUserByEmail(email);
-    if (!user) throw new UnauthorizedException('Невірні облікові дані');
+    if (!user) {
+      throw new BadRequestException('Невірні облікові дані');
+    }
 
     const record = await this.prisma.mfaCode.findFirst({
       where: {
@@ -147,9 +155,7 @@ export class AuthService {
     });
 
     if (!record)
-      throw new UnauthorizedException(
-        'Невірний або непідтверджений користувач',
-      );
+      throw new BadRequestException('Невірний або непідтверджений користувач');
 
     await this.prisma.mfaCode.delete({
       where: { id: record.id },
@@ -177,7 +183,7 @@ export class AuthService {
 
   async verifyPasswordResetCode({ email, code }: VerifyPasswordResetCodeDto) {
     const user = await this.userRepository.findUserByEmail(email);
-    if (!user) throw new UnauthorizedException('Невірний користувач');
+    if (!user) throw new BadRequestException('Невірний користувач');
 
     const record = await this.prisma.passwordResetCode.findFirst({
       where: {
@@ -192,7 +198,9 @@ export class AuthService {
 
   async resetPassword({ email, newPassword }: ResetPasswordDto) {
     const user = await this.userRepository.findUserByEmail(email);
-    if (!user) throw new UnauthorizedException('Користувача не знайдено');
+    if (!user) {
+      throw new BadRequestException('Користувача не знайдено');
+    }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await this.userRepository.updateUserPassword(user.id, hashedPassword);

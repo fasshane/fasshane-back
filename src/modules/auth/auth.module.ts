@@ -1,3 +1,4 @@
+// src/modules/auth/auth.module.ts
 import { Module } from '@nestjs/common';
 import { PrismaService } from 'nestjs-prisma';
 import { AuthController } from './auth.controller';
@@ -12,6 +13,7 @@ import { MailModule } from '../../shared';
 @Module({
   imports: [
     JwtModule.registerAsync({
+      global: true,
       useFactory: () => ({
         secret: env.JWT_SECRET,
         signOptions: { expiresIn: '7d' },
@@ -28,5 +30,6 @@ import { MailModule } from '../../shared';
     JwtAuthGuard,
     GoogleStrategy,
   ],
+  exports: [JwtAuthGuard, JwtModule, UserModule],
 })
 export class AuthModule {}

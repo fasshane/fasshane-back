@@ -20,6 +20,7 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:reset": "prisma migrate reset --force",
+    "delete-user": "ts-node ./prisma/script/delete-user-by-email.ts",
     "seed": "ts-node ./prisma/seeds/index.ts",
     "lint": "eslint \"{src,tests}/**/*.{ts,tsx}\" --max-warnings=0",
     "format": "prettier --write ."
