@@ -8,7 +8,7 @@ export const createSuppliers = async () => {
   const suppliersData = [
     {
       name: 'Свіжі Органічні Ферми',
-      email: 'contact@freshorganicfarms.com',
+      email: 'contact1@freshorganicfarms.com',
       phone: '555-111-2222',
     },
     {

@@ -23,6 +23,7 @@ export class UserController {
 
   @Get('/me')
   async getMe(@Req() req) {
+    console.log(req.user);
     return req.user;
   }
 

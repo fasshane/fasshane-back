@@ -8,18 +8,18 @@ import { createLocations } from './locations.seed';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create suppliers
-  const suppliers = await createSuppliers();
-
-  // Create products
-  const products = await createProducts(suppliers);
+  // // Create suppliers
+  // const suppliers = await createSuppliers();
+  //
+  // // Create products
+  // await createProducts(suppliers);
 
   const categories = await createCategories();
-  
+
   const locations = await createLocations();
 
   // Create meals
-  await createMeals(products, categories, locations);
+  await createMeals(categories, locations);
 
   console.log('✅ Seed data created successfully!');
 }
