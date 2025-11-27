@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "nest build",
+    "postbuild": "echo \"✅ Build completed successfully for Fasshane API\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
