@@ -206,42 +206,45 @@ model Ingredient {
 }
 
 model MealCategory {
-  id        String          @id @default(uuid())
-  name      String
-  slug      String          @unique
-  parentId  String?
-  parent    MealCategory?   @relation("Subcategories", fields: [parentId], references: [id])
-  children  MealCategory[]  @relation("Subcategories")
-  meals     Meal[]          
+  id       String         @id @default(uuid())
+  name     String
+  slug     String         @unique
+  parentId String?
+  parent   MealCategory?  @relation("Subcategories", fields: [parentId], references: [id])
+  children MealCategory[] @relation("Subcategories")
+  meals    Meal[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Location {
-  id        String          @id @default(uuid())
-  name      String
-  address   String
-  phone     String?
-  avatar    String?     
-  slug      String          @unique     
-  openTime  String          @default("09:00")
-  closeTime String          @default("18:00")
+  id      String  @id @default(uuid())
+  name    String
+  address String
+  phone   String?
+  avatar  String?
+  slug    String  @unique
 
-  meals     LocationMeal[]
+  wifiSsid     String?
+  wifiPassword String?
+  socialLinks  Json? // { "instagram":"...", "telegram":"...", "facebook":"..." }
+  openingHours Json? // { "mon":[{"from":"09:00","to":"18:00"}], ... }
+
+  meals LocationMeal[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model LocationMeal {
-  id         String   @id @default(uuid())
+  id         String @id @default(uuid())
   locationId String
   mealId     String
 
-  available  Boolean  @default(true)
-  price      Decimal? 
-  stock      Int?
+  available Boolean  @default(true)
+  price     Decimal?
+  stock     Int?
 
   location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
   meal     Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
@@ -253,13 +256,13 @@ model LocationMeal {
 }
 
 model Meal {
-  id                    String       @id @default(uuid())
-  name                  String
-  description           String?
-  image                 String?
-  ingredients           Ingredient[]
-  price                 Decimal      @default(0)
-  weight                Decimal?     @db.Decimal(10, 2)
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  image       String?
+  ingredients Ingredient[]
+  price       Decimal      @default(0)
+  weight      Decimal?     @db.Decimal(10, 2)
 
   categoryId String?
   category   MealCategory? @relation(fields: [categoryId], references: [id])
