@@ -6,7 +6,7 @@ import { UserResponseDto } from './dto/response/user.response.dto';
 
 @Injectable()
 export class UserRepository {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   findUserByEmail(email: string): Promise<User> {
     return this.prisma.user.findUnique({
@@ -15,8 +15,16 @@ export class UserRepository {
   }
 
   createUser(user: CreateUserModel): Promise<UserResponseDto> {
+    const roleRelations = this.buildRoleRelation(user);
     return this.prisma.user.create({
-      data: user,
+      data: {
+        googleId: user?.googleId,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        password: user.password,
+        ...roleRelations,
+      },
       select: selectFields,
     });
   }
@@ -65,6 +73,41 @@ export class UserRepository {
       where: { id: userId },
       data: { password: hashedPassword },
     });
+  }
+
+  private buildRoleRelation(user: CreateUserModel) {
+    switch (user.role) {
+      case Role.MANAGER:
+        return {
+          manager: {
+            create: {
+              department: user.department || 'General',
+            },
+          },
+        };
+      case Role.ADMIN:
+        return {
+          admin: {
+            create: {
+              permissions: user.permissions || 'ALL',
+            },
+          },
+        };
+      case Role.CASHIER:
+        return {
+          cashier: {
+            create: {
+              register: user.register ?? null,
+            },
+          },
+        };
+      default:
+        return {
+          customer: {
+            create: {},
+          },
+        };
+    }
   }
 }
 
