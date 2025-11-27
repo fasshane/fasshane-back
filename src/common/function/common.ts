@@ -79,3 +79,22 @@ export const objectToUrlEncoded = (data: Record<string, any>): string => {
 
   return form.toString();
 };
+
+export function slugify(value: string): string {
+  if (!value) {
+    return 'category';
+  }
+
+  const normalized = value
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
+
+  return normalized || 'category';
+}
+
