@@ -258,9 +258,6 @@ model Meal {
   description           String?
   image                 String?
   ingredients           Ingredient[]
-  additionsAvailable    Ingredient[]
-  additions             Ingredient[]
-  removings             String[]
   price                 Decimal      @default(0)
   weight                Decimal?     @db.Decimal(10, 2)
 
