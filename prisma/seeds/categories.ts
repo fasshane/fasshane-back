@@ -2,37 +2,37 @@ import { type MealCategory, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function createCategories(): Promise<
-  Record<string, MealCategory>
-> {
+export async function createCategories(): Promise<Record<string, MealCategory>> {
   const categoriesData = [
-    { name: 'Закуски', slug: 'appetizers' },
-    { name: 'Сніданок', slug: 'breakfast' },
-    { name: 'Основні страви', slug: 'main-courses' },
-    { name: 'Десерти', slug: 'desserts' },
-    { name: 'Напої', slug: 'drinks' },
-    { name: 'Вегетаріанська', slug: 'vegetarian' },
+    { name: 'Сніданки– FassCorner', slug: 'breakfast-fasscorner' },
   ];
 
   const subCategoriesData = [
-    { name: 'Салати', slug: 'salads', parentSlug: 'appetizers' },
-    { name: 'Супи', slug: 'soups', parentSlug: 'appetizers' },
-    { name: 'Паста', slug: 'pasta', parentSlug: 'main-courses' },
-    { name: 'Стейки', slug: 'steaks', parentSlug: 'main-courses' },
     {
-      name: 'Торти та випічка',
-      slug: 'cakes-pastries',
-      parentSlug: 'desserts',
+      name: 'Вівсяні Каші (Porridge)',
+      slug: 'porridge',
+      parentSlug: 'breakfast-fasscorner',
     },
-    { name: 'Морозиво та сорбети', slug: 'ice-cream', parentSlug: 'desserts' },
-    { name: 'Коктейлі', slug: 'cocktails', parentSlug: 'drinks' },
-    { name: 'Кава та чай', slug: 'coffee-tea', parentSlug: 'drinks' },
+    {
+      name: 'Йогуртові Боули',
+      slug: 'yogurt-bowls',
+      parentSlug: 'breakfast-fasscorner',
+    },
+    {
+      name: 'Українські Молочні Каші',
+      slug: 'ukrainian-milk-porridges',
+      parentSlug: 'breakfast-fasscorner',
+    },
+    {
+      name: 'Солоні Боули',
+      slug: 'savory-bowls',
+      parentSlug: 'breakfast-fasscorner',
+    },
   ];
 
   const created: Record<string, MealCategory> = {};
 
   try {
-    // 1) Top-level categories — upsert (idempotent)
     for (const c of categoriesData) {
       const cat = await prisma.mealCategory.upsert({
         where: { slug: c.slug },
@@ -42,9 +42,7 @@ export async function createCategories(): Promise<
       created[c.slug] = cat;
     }
 
-    // 2) Subcategories — ensure parent exists (either in created map or in DB)
     for (const sc of subCategoriesData) {
-      // знайдемо parent id: спочатку з map, інакше з БД
       let parent = created[sc.parentSlug];
       if (!parent) {
         parent =

@@ -63,6 +63,11 @@ export class MealRepository {
           in: ids,
         },
       },
+      include: {
+        ingredients: {
+          select: { product: true },
+        },
+      },
     });
   }
 

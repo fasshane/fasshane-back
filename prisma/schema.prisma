@@ -260,8 +260,11 @@ model Meal {
   name        String
   description String?
   image       String?
+  allergens   String[]     @db.Text
   ingredients Ingredient[]
   price       Decimal      @default(0)
+  weightMin   Decimal?     @db.Decimal(10, 2)
+  weightMax   Decimal?     @db.Decimal(10, 2)
   weight      Decimal?     @db.Decimal(10, 2)
 
   categoryId String?

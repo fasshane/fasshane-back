@@ -2,232 +2,433 @@ import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+type MealSeed = {
+  name: string;
+  description?: string;
+  composition: string;
+  image?: string;
+  price: number;
+  weightMin: number;
+  weightMax: number;
+  allergens: string[];
+  categorySlug: string;
+  locationSlugs: string[];
+  ingredients: { product: string; quantity: number }[];
+};
+
+const defaultImage = 'https://images.pexels.com/photos/376464/pexels-photo-376464.jpeg';
+
+export const mealsData: MealSeed[] = [
+  {
+    name: 'Класична Фруктова Вівсянка — Classic Fruit Porridge',
+    description:
+      'Класична Фруктова Вівсянка — ніжна вівсянка на молоці з бананом і яблуком/грушею, підсолоджена медом.',
+    composition: 'вівсянка, молоко, банан, яблуко/груша, мед',
+    image: defaultImage,
+    price: 145,
+    weightMin: 350,
+    weightMax: 380,
+    allergens: ['глютен', 'молочні продукти', 'мед'],
+    categorySlug: 'porridge',
+    locationSlugs: ['cafe-center'],
+    ingredients: [
+      { product: 'Вівсянка', quantity: 80 },
+      { product: 'Молоко', quantity: 200 },
+      { product: 'Банан', quantity: 60 },
+      { product: 'Яблуко', quantity: 50 },
+      { product: 'Груша', quantity: 50 },
+      { product: 'Мед', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Berry Porridge — Вівсянка з Ягідним Міксом',
+    description:
+      'Berry Porridge — яскрава вівсянка з молоком і лісовими ягодами, підсолоджена медом чи кленовим сиропом.',
+    composition: 'вівсянка, молоко, лісові ягоди, мед або кленовий сироп',
+    image: defaultImage,
+    price: 150,
+    weightMin: 350,
+    weightMax: 380,
+    allergens: ['глютен', 'молочні продукти', 'мед (за наявності)'],
+    categorySlug: 'porridge',
+    locationSlugs: ['cafe-center'],
+    ingredients: [
+      { product: 'Вівсянка', quantity: 80 },
+      { product: 'Молоко', quantity: 200 },
+      { product: 'Лісові ягоди', quantity: 80 },
+      { product: 'Мед', quantity: 15 },
+      { product: 'Кленовий сироп', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Nut & Honey Porridge — Горіхово-Медова Вівсянка',
+    description:
+      'Nut & Honey Porridge — кремова вівсянка з міксом горіхів і квітковим медом.',
+    composition: 'вівсянка, молоко, мікс горіхів, мед',
+    image: defaultImage,
+    price: 155,
+    weightMin: 340,
+    weightMax: 360,
+    allergens: ['глютен', 'молочні продукти', 'горіхи', 'мед'],
+    categorySlug: 'porridge',
+    locationSlugs: ['cafe-center', 'roof-restaurant'],
+    ingredients: [
+      { product: 'Вівсянка', quantity: 80 },
+      { product: 'Молоко', quantity: 200 },
+      { product: 'Мікс горіхів', quantity: 40 },
+      { product: 'Мед', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Chocolate Banana Porridge — Шоколадно-Бананова Вівсянка',
+    description:
+      'Chocolate Banana Porridge — десертна вівсянка з бананом, какао та стружкою темного шоколаду.',
+    composition: 'вівсянка, молоко, банан, какао-порошок, темний шоколад',
+    image: defaultImage,
+    price: 160,
+    weightMin: 350,
+    weightMax: 380,
+    allergens: ['глютен', 'молочні продукти', 'какао', 'шоколад'],
+    categorySlug: 'porridge',
+    locationSlugs: ['roof-restaurant'],
+    ingredients: [
+      { product: 'Вівсянка', quantity: 80 },
+      { product: 'Молоко', quantity: 200 },
+      { product: 'Банан', quantity: 80 },
+      { product: 'Какао-порошок', quantity: 10 },
+      { product: 'Темний шоколад', quantity: 20 },
+    ],
+  },
+  {
+    name: 'Granola & Fruit Yogurt Bowl — Йогурт-Боул з Гранолою та Фруктами',
+    description:
+      'Granola & Fruit Yogurt Bowl — легкий йогуртовий боул з гранолою, бананом, полуницею/яблуком та медом.',
+    composition: 'йогурт, гранола, банан, полуниця/яблуко, мед',
+    image: defaultImage,
+    price: 165,
+    weightMin: 280,
+    weightMax: 320,
+    allergens: ['молочні продукти', 'глютен', 'горіхи (можливо)', 'мед'],
+    categorySlug: 'yogurt-bowls',
+    locationSlugs: ['cafe-center'],
+    ingredients: [
+      { product: 'Йогурт', quantity: 180 },
+      { product: 'Гранола', quantity: 60 },
+      { product: 'Банан', quantity: 60 },
+      { product: 'Полуниця', quantity: 50 },
+      { product: 'Яблуко', quantity: 50 },
+      { product: 'Мед', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Berry Yogurt Bowl — Йогурт-Боул з Ягідним Міксом',
+    description:
+      'Berry Yogurt Bowl — освіжаючий боул з йогуртом, гранолою та щедрим ягідним міксом, підсолодженим кленовим сиропом.',
+    composition: 'йогурт, гранола, лісові ягоди, кленовий сироп',
+    image: defaultImage,
+    price: 170,
+    weightMin: 260,
+    weightMax: 300,
+    allergens: ['молочні продукти', 'глютен'],
+    categorySlug: 'yogurt-bowls',
+    locationSlugs: ['cafe-center', 'roof-restaurant'],
+    ingredients: [
+      { product: 'Йогурт', quantity: 180 },
+      { product: 'Гранола', quantity: 60 },
+      { product: 'Лісові ягоди', quantity: 80 },
+      { product: 'Кленовий сироп', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Tropical Yogurt Bowl — Тропічний Йогурт-Боул',
+    description:
+      'Tropical Yogurt Bowl — літній боул з йогуртом, гранолою, ананасом, манго, ківі та кокосовою стружкою.',
+    composition: 'йогурт, гранола, ананас/манго/ківі, кокосова стружка',
+    image: defaultImage,
+    price: 175,
+    weightMin: 260,
+    weightMax: 300,
+    allergens: ['молочні продукти', 'глютен', 'кокос'],
+    categorySlug: 'yogurt-bowls',
+    locationSlugs: ['roof-restaurant'],
+    ingredients: [
+      { product: 'Йогурт', quantity: 180 },
+      { product: 'Гранола', quantity: 60 },
+      { product: 'Ананас', quantity: 60 },
+      { product: 'Манго', quantity: 60 },
+      { product: 'Ківі', quantity: 40 },
+      { product: 'Кокосова стружка', quantity: 10 },
+    ],
+  },
+  {
+    name: 'Nut & Honey Yogurt Bowl — Горіхово-Медовий Йогурт-Боул',
+    description:
+      'Nut & Honey Yogurt Bowl — вершковий йогурт з гранолою, міксом горіхів і медом для збалансованої солодкості.',
+    composition: 'йогурт, гранола, мікс горіхів, мед',
+    image: defaultImage,
+    price: 180,
+    weightMin: 260,
+    weightMax: 300,
+    allergens: ['молочні продукти', 'глютен', 'горіхи', 'мед'],
+    categorySlug: 'yogurt-bowls',
+    locationSlugs: ['cafe-center'],
+    ingredients: [
+      { product: 'Йогурт', quantity: 180 },
+      { product: 'Гранола', quantity: 60 },
+      { product: 'Мікс горіхів', quantity: 40 },
+      { product: 'Мед', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Стілка Гречана — Гречана Каша з Молоком',
+    description:
+      'Стілка Гречана — домашня гречана каша на молоці з вершковим маслом, цукром або медом.',
+    composition: 'гречка, молоко, вершкове масло, цукор або мед',
+    image: defaultImage,
+    price: 185,
+    weightMin: 300,
+    weightMax: 330,
+    allergens: ['молочні продукти'],
+    categorySlug: 'ukrainian-milk-porridges',
+    locationSlugs: ['cafe-center', 'roof-restaurant'],
+    ingredients: [
+      { product: 'Гречка', quantity: 90 },
+      { product: 'Молоко', quantity: 200 },
+      { product: 'Вершкове масло', quantity: 10 },
+      { product: 'Цукор', quantity: 10 },
+      { product: 'Мед', quantity: 10 },
+    ],
+  },
+  {
+    name: 'Рисова Каша — Рисова Каша з Молоком',
+    description:
+      'Рисова Каша — ніжний рис на молоці з вершковим маслом та ароматом ванільного цукру або кориці.',
+    composition: 'рис, молоко, вершкове масло, ванільний цукор/кориця',
+    image: defaultImage,
+    price: 190,
+    weightMin: 290,
+    weightMax: 320,
+    allergens: ['молочні продукти'],
+    categorySlug: 'ukrainian-milk-porridges',
+    locationSlugs: ['cafe-center'],
+    ingredients: [
+      { product: 'Рис', quantity: 90 },
+      { product: 'Молоко', quantity: 200 },
+      { product: 'Вершкове масло', quantity: 10 },
+      { product: 'Ванільний цукор', quantity: 5 },
+      { product: 'Кориця', quantity: 2 },
+    ],
+  },
+  {
+    name: 'Вермішелєва Каша — Каша з Вермішеллю та Молоком',
+    description:
+      'Вермішелєва Каша — класична молочна каша з вермішеллю та ніжним вершковим маслом.',
+    composition: 'вермішель, молоко, вершкове масло, цукор або мед',
+    image: defaultImage,
+    price: 195,
+    weightMin: 290,
+    weightMax: 320,
+    allergens: ['молочні продукти', 'глютен'],
+    categorySlug: 'ukrainian-milk-porridges',
+    locationSlugs: ['cafe-center'],
+    ingredients: [
+      { product: 'Вермішель', quantity: 90 },
+      { product: 'Молоко', quantity: 200 },
+      { product: 'Вершкове масло', quantity: 10 },
+      { product: 'Цукор', quantity: 10 },
+      { product: 'Мед', quantity: 10 },
+    ],
+  },
+  {
+    name: 'Mix Bowl — Мікс-Боул',
+    description:
+      'Mix Bowl — комбінована молочна каша з рису, гречки та вермішелі з родзинками, горіхами і медом.',
+    composition: 'рис/гречка/вермішель, молоко, родзинки, горіхи, мед',
+    image: defaultImage,
+    price: 200,
+    weightMin: 300,
+    weightMax: 330,
+    allergens: ['молочні продукти', 'глютен (за вибором)', 'горіхи', 'мед'],
+    categorySlug: 'ukrainian-milk-porridges',
+    locationSlugs: ['roof-restaurant'],
+    ingredients: [
+      { product: 'Рис', quantity: 50 },
+      { product: 'Гречка', quantity: 50 },
+      { product: 'Вермішель', quantity: 50 },
+      { product: 'Молоко', quantity: 200 },
+      { product: 'Родзинки', quantity: 20 },
+      { product: 'Мікс горіхів', quantity: 30 },
+      { product: 'Мед', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Avocado & Egg Bowl — Боул з Авокадо та Яйцем',
+    description:
+      'Avocado & Egg Bowl — ситний боул з гречкою, стиглим авокадо, руколою/шпинатом та вареним яйцем.',
+    composition: 'авокадо, варене яйце, гречка, рукола/шпинат, оливкова олія',
+    image: defaultImage,
+    price: 205,
+    weightMin: 260,
+    weightMax: 300,
+    allergens: ['яйце'],
+    categorySlug: 'savory-bowls',
+    locationSlugs: ['cafe-center'],
+    ingredients: [
+      { product: 'Авокадо', quantity: 80 },
+      { product: 'Яйце', quantity: 2 },
+      { product: 'Гречка', quantity: 100 },
+      { product: 'Рукола', quantity: 20 },
+      { product: 'Шпинат', quantity: 20 },
+      { product: 'Оливкова олія', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Veggie Oatmeal Bowl — Овочева Вівсянка',
+    description:
+      'Veggie Oatmeal Bowl — тепла вівсянка на овочевому бульйоні зі шпинатом, грибами й яйцем.',
+    composition: 'вівсянка, овочевий бульйон, шпинат, гриби, яйце, оливкова олія',
+    image: defaultImage,
+    price: 210,
+    weightMin: 300,
+    weightMax: 330,
+    allergens: ['глютен', 'яйце'],
+    categorySlug: 'savory-bowls',
+    locationSlugs: ['roof-restaurant'],
+    ingredients: [
+      { product: 'Вівсянка', quantity: 90 },
+      { product: 'Овочевий бульйон', quantity: 200 },
+      { product: 'Шпинат', quantity: 40 },
+      { product: 'Гриби', quantity: 60 },
+      { product: 'Яйце', quantity: 1 },
+      { product: 'Оливкова олія', quantity: 15 },
+    ],
+  },
+  {
+    name: 'Bulgur & Tvorog Bowl — Булгур-Боул з Творогом',
+    description:
+      'Bulgur & Tvorog Bowl — теплий булгур із свіжими овочами, творогом та оливково-лимонним соусом.',
+    composition: 'булгур, помідор, огірок, творог, оливково-лимонний соус',
+    image: defaultImage,
+    price: 215,
+    weightMin: 290,
+    weightMax: 320,
+    allergens: ['молочні продукти', 'глютен'],
+    categorySlug: 'savory-bowls',
+    locationSlugs: ['cafe-center', 'roof-restaurant'],
+    ingredients: [
+      { product: 'Булгур', quantity: 100 },
+      { product: 'Помідор', quantity: 60 },
+      { product: 'Огірок', quantity: 60 },
+      { product: 'Творог', quantity: 80 },
+      { product: 'Оливково-лимонний соус', quantity: 20 },
+    ],
+  },
+  {
+    name: 'Savory Rice Bowl — Солоний Рис-Боул',
+    description:
+      'Savory Rice Bowl — рисовий боул з яйцем, кукурудзою, зеленим горошком, зеленню та легкою олійною заправкою.',
+    composition:
+      'рис, варене яйце, кукурудза, зелений горошок, зелень, оливкова олія/масло',
+    image: defaultImage,
+    price: 220,
+    weightMin: 300,
+    weightMax: 330,
+    allergens: ['яйце', 'молочні продукти (якщо є масло)'],
+    categorySlug: 'savory-bowls',
+    locationSlugs: ['cafe-center'],
+    ingredients: [
+      { product: 'Рис', quantity: 120 },
+      { product: 'Яйце', quantity: 1 },
+      { product: 'Кукурудза', quantity: 60 },
+      { product: 'Зелений горошок', quantity: 50 },
+      { product: 'Зелень', quantity: 20 },
+      { product: 'Оливкова олія', quantity: 15 },
+      { product: 'Масло', quantity: 10 },
+    ],
+  },
+];
+
+const toDecimal = (value?: number | null) =>
+  value != null ? new Prisma.Decimal(String(value)) : null;
+
 export async function createMeals(
   categories: Record<string, any>,
   locations: Record<string, any>,
 ) {
-  const mealsData = [
-    {
-      name: 'Спагеті Карбонара',
-      description:
-        'Кремова італійська паста з яйцями, сиром, панчеттою та чорним перцем. Просто, насичено й затишно.',
-      image:
-        'https://static01.nyt.com/images/2021/02/14/dining/carbonara-horizontal/carbonara-horizontal-threeByTwoMediumAt2X-v2.jpg',
-      price: 23,
-      weight: 300,
-      categorySlug: 'pasta',
-      locationSlugs: ['cafe-center', 'roof-restaurant'],
-    },
-    {
-      name: 'Курка в маслі',
-      description:
-        'Ніжні шматочки курки, тушковані в томатному соусі з вершками та маслом. Улюблена страва Північної Індії.',
-      image:
-        'https://www.mysavoryadventures.com/wp-content/uploads/2023/04/restaurant-style-butter-chicken-768x1024.jpg',
-      price: 24,
-      weight: 280,
-      categorySlug: 'main-courses',
-      locationSlugs: ['cafe-center', 'roof-restaurant'],
-    },
-    {
-      name: 'Сет Суші',
-      description:
-        'Набір делікатних ролів і ніґірі з рибою, авокадо та овочами, подається з соєвим соусом, васабі та імбирем.',
-      image:
-        'https://www.craftoria.com/cdn/shop/files/sushi_platter.jpg?v=1697443699',
-      price: 25,
-      weight: 350,
-      categorySlug: 'appetizers',
-      locationSlugs: ['cafe-center', 'roof-restaurant'],
-    },
-    {
-      name: 'Яловичина Бургіньйон',
-      description:
-        'Класичне французьке рагу з яловичини, тушкованої у червоному вині з часником, цибулею, морквою та грибами.',
-      image:
-        'https://www.thespruceeats.com/thmb/9bHcJtt9VacFlLw_hdDPHc7LclY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/SES-classic-beef-bourguignon-recipe-7498352-step-16-fc657c2f9fcc42588c7ea30de37ad02b.jpg',
-      price: 26,
-      weight: 400,
-      categorySlug: 'main-courses',
-      locationSlugs: ['park-cafe', 'cafe-center'],
-    },
-    {
-      name: 'Шакшука',
-      description:
-        'Яйця пашот у гострому соусі з томатів та перцю, приправлені кумином і паприкою. Популярна страва Близького Сходу.',
-      image:
-        'https://assets.bonappetit.com/photos/66b0f58d0166f714b46433a9/1:1/w_3333,h_3333,c_limit/30-min-shakshuka_LEDE_071824_0935_VOG_final.jpg',
-      price: 27,
-      weight: 320,
-      categorySlug: 'breakfast',
-      locationSlugs: ['cafe-center', 'roof-restaurant'],
-    },
-    {
-      name: 'Тако аль Пастор',
-      description:
-        'Мексиканські тако з маринованою свининою, ананасом, цибулею та кінзою у кукурудзяних тортильях.',
-      image:
-        'https://www.thespruceeats.com/thmb/wQd2RvxH1Lh9536W5LY1T_VSyT8=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/tacos-al-pastor-recipe-4172074-hero-01-7fb1a4455397486b8485ac8ec2ca3c5a.jpg',
-      price: 28,
-      weight: 250,
-      categorySlug: 'drinks',
-      locationSlugs: ['cafe-center', 'park-cafe'],
-    },
-    {
-      name: 'Пад Тай',
-      description:
-        'Смажена рисова локшина з креветками, тофу, арахісом, яйцями та паростками квасолі у кисло-солодкому соусі з тамаринду.',
-      image:
-        'https://san-j.com/wp-content/uploads/2023/09/Crispy-Chicken-Pad-Thai.jpeg',
-      price: 29,
-      weight: 330,
-      categorySlug: 'vegetarian',
-      locationSlugs: ['roof-restaurant'],
-    },
-    {
-      name: 'Фалафель у піті',
-      description:
-        'Хрусткі кульки з нуту у теплому піті з хумусом, тахіні, овочами та соліннями.',
-      image:
-        'https://fooddoodz.tv/assets/images/2020-05-19-Falafel-Wraps/2020-05-19-Falafel-Wraps--Hero-Image-900.jpg',
-      price: 30,
-      weight: 280,
-      categorySlug: 'vegetarian',
-      locationSlugs: ['cafe-center', 'roof-restaurant'],
-    },
-    {
-      name: 'Бібімбап',
-      description:
-        'Корейська рисова страва з овочами, маринованою яловичиною, смаженим яйцем та соусом кочуджан.',
-      image:
-        'https://res.cloudinary.com/hellochef/image/upload/c_fit/q_auto/dpr_auto/n4fjbctl5ffexe634ti5?_a=E',
-      price: 31,
-      weight: 350,
-      categorySlug: 'breakfast',
-      locationSlugs: ['roof-restaurant', 'cafe-center'],
-    },
-    {
-      name: 'Курка Тikka Масала',
-      description:
-        'Запечені шматочки курки у вершково-пряному томатному соусі. Найкраще смакує з нааном.',
-      image:
-        'https://realfood.tesco.com/media/images/1400x919-Chicken-tikka-masala-43fcdbd8-eb86-4b55-951d-adda29067afa-0-1400x919.jpg',
-      price: 32,
-      weight: 320,
-      categorySlug: 'main-courses',
-      locationSlugs: ['cafe-center', 'park-cafe'],
-    },
-    {
-      name: 'Грецька Мусака',
-      description:
-        'Шари обсмажених баклажанів, м’яса зі спеціями та ніжного бешамельного соусу, запечені до золотистої скоринки.',
-      image:
-        'https://www.dianekochilas.com/wp-content/uploads/2023/11/Moussaka-Recipe-Greek-Eggplant-Casserole.jpg',
-      price: 33,
-      weight: 400,
-      categorySlug: 'main-courses',
-      locationSlugs: ['roof-restaurant', 'park-cafe'],
-    },
-    {
-      name: 'Рамен',
-      description:
-        'Японська локшина в ароматному бульйоні з м’ясом, яйцем, норі та зеленню. Ситна й зігріваюча страва.',
-      image:
-        'https://images.gastronom.ru/kfXGMYFcHvgNNJj4w9FVkqrjjX7pWxjq2GpzsdN1M1E/pr:recipe-cover-image/g:ce/rs:auto:0:0:0/L2Ntcy9hbGwtaW1hZ2VzLzJjMWMzYzIzLTc3OGMtNDJhNC04YzkwLTFmYTA0NzdkYzRjMS5qcGc.webp',
-      price: 34,
-      weight: 350,
-      categorySlug: 'breakfast',
-      locationSlugs: ['roof-restaurant', 'cafe-center'],
-    },
-  ];
-
   try {
     for (const meal of mealsData) {
       const category = categories[meal.categorySlug];
       if (!category) {
-        console.error(
-          `Категорія не знайдена: ${meal.categorySlug} — пропускаю "${meal.name}"`,
-        );
+        console.error(`Missing category ${meal.categorySlug} for meal "${meal.name}"`);
         continue;
       }
 
-      // 1) Спроба знайти існуючу страву по name
       const existing = await prisma.meal.findFirst({
         where: { name: meal.name },
       });
 
-      // 2) Якщо знайдено — оновимо по id, інакше створимо
+      const baseData = {
+        description: meal.description ?? meal.composition,
+        image: meal.image ?? defaultImage,
+        price: new Prisma.Decimal(String(meal.price)),
+        weightMin: toDecimal(meal.weightMin),
+        weightMax: toDecimal(meal.weightMax),
+        weight: toDecimal((meal.weightMin + meal.weightMax) / 2),
+        allergens: meal.allergens,
+        categoryId: category.id,
+      };
+
       const createdOrUpdated = existing
         ? await prisma.meal.update({
-            where: { id: existing.id }, // тут потрібен id — саме те, що вимагає MealWhereUniqueInput
-            data: {
-              description: meal.description,
-              image: meal.image,
-              price: new Prisma.Decimal(String(meal.price)),
-              weight:
-                meal.weight != null
-                  ? new Prisma.Decimal(String(meal.weight))
-                  : null,
-              categoryId: category.id,
-            },
+            where: { id: existing.id },
+            data: baseData,
           })
         : await prisma.meal.create({
             data: {
               name: meal.name,
-              description: meal.description,
-              image: meal.image,
-              price: new Prisma.Decimal(String(meal.price)),
-              weight:
-                meal.weight != null
-                  ? new Prisma.Decimal(String(meal.weight))
-                  : null,
-              categoryId: category.id,
+              ...baseData,
             },
           });
 
-      // 3) Прив'язка до локацій (створення LocationMeal) — перевірка дубля перед створенням
       for (const locationSlug of meal.locationSlugs) {
         const location = locations[locationSlug];
         if (!location) {
           console.error(
-            `Локація не знайдена: ${locationSlug} — пропускаю зв'язок для "${meal.name}"`,
+            `Missing location ${locationSlug} for meal "${meal.name}"`,
           );
           continue;
         }
 
-        // знайдемо існуючий зв'язок
         const lm = await prisma.locationMeal.findFirst({
           where: { locationId: location.id, mealId: createdOrUpdated.id },
         });
 
         if (lm) {
-          // оновити, якщо потрібно (ціна/stock)
           await prisma.locationMeal.update({
             where: { id: lm.id },
             data: {
               price: new Prisma.Decimal(String(meal.price)),
               available: true,
-              stock: Math.floor(Math.random() * 20) + 5,
+              stock: lm.stock ?? 10,
             },
           });
         } else {
-          // створити новий зв'язок
           await prisma.locationMeal.create({
             data: {
               locationId: location.id,
               mealId: createdOrUpdated.id,
               price: new Prisma.Decimal(String(meal.price)),
               available: true,
-              stock: Math.floor(Math.random() * 20) + 5,
+              stock: 15,
             },
           });
         }
       }
     }
 
-    console.log('✅ Страви успішно додані/оновлені');
+    console.log('✅ Meals seeded/updated');
   } catch (err) {
-    console.error('Помилка при seed meals:', err);
+    console.error('Error during seed meals:', err);
     throw err;
   } finally {
     await prisma.$disconnect();

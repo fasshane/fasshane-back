@@ -4,6 +4,7 @@ import { createProducts } from './products.seed';
 import { createMeals } from './meals.seed';
 import { createCategories } from './categories';
 import { createLocations } from './locations.seed';
+import { createIngredients } from './ingredients.seed';
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,9 @@ async function main() {
 
   // Create meals
   await createMeals(categories, locations);
+
+  // Create ingredients
+  await createIngredients();
 
   console.log('✅ Seed data created successfully!');
 }
