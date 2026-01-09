@@ -8,11 +8,11 @@ import { createLocations } from './locations.seed';
 const prisma = new PrismaClient();
 
 async function main() {
-  // // Create suppliers
-  // const suppliers = await createSuppliers();
-  //
-  // // Create products
-  // await createProducts(suppliers);
+  // Create suppliers
+  const suppliers = await createSuppliers();
+
+  // Create products
+  await createProducts(suppliers);
 
   const categories = await createCategories();
 
