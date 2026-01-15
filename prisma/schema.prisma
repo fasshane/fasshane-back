@@ -8,26 +8,24 @@ datasource db {
 }
 
 model User {
-  id            String          @id @default(uuid())
-  email         String          @unique
-  password      String?
-  avatar        String?         @default("https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png")
-  name          String
-  role          Role
-  status        UserStatus      @default(ACTIVE)
-  googleId      String?         @unique
-  CustomerOrder CustomerOrder[]
-
-  admin    Admin?
-  customer Customer?
-  manager  Manager?
-  cashier  Cashier?
-
+  id                String                @id @default(uuid())
+  email             String                @unique
+  password          String?
+  avatar            String?               @default("https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png")
+  name              String
+  role              Role
+  status            UserStatus            @default(ACTIVE)
+  googleId          String?               @unique
   isVerified        Boolean               @default(false)
   createAt          DateTime              @default(now())
   updatedAt         DateTime              @updatedAt
-  codes             MfaCode[]
+  admin             Admin?
+  cashier           Cashier?
+  customer          Customer?
+  CustomerOrder     CustomerOrder[]
   activationToken   EmailActivationToken?
+  manager           Manager?
+  codes             MfaCode[]
   PasswordResetCode PasswordResetCode[]
 }
 
@@ -36,11 +34,9 @@ model MfaCode {
   userId    String
   code      String   @unique
   expiresAt DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -50,114 +46,101 @@ model EmailActivationToken {
   userId    String   @unique
   token     String   @unique
   expiresAt DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model PasswordResetCode {
   id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
   code      String
   expiresAt DateTime
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Customer {
-  id     String @id @default(uuid())
-  userId String @unique
-  points Int    @default(0)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  points    Int      @default(0)
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Manager {
-  id         String @id @default(uuid())
-  userId     String @unique
+  id         String   @id @default(uuid())
+  userId     String   @unique
   department String
-  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createAt   DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Admin {
-  id          String @id @default(uuid())
-  userId      String @unique
+  id          String   @id @default(uuid())
+  userId      String   @unique
   permissions String
-  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createAt    DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Cashier {
-  id       String  @id @default(uuid())
-  userId   String  @unique
-  register String? // cash register ID or workplace
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  orders CustomerOrder[] // Orders created by this cashier
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String          @id @default(uuid())
+  userId    String          @unique
+  register  String?
+  createAt  DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders    CustomerOrder[]
 }
 
 model Supplier {
-  id     String  @id @default(uuid())
-  name   String
-  email  String  @unique
-  rating Decimal @default(1)
-  active Boolean @default(true)
-  phone  String?
-  avatar String  @default("https://img.freepik.com/premium-vector/supplier-icon-vector-image-can-be-used-supply-chain_120816-403225.jpg")
-
-  products SupplierProducts[]
-  orders   SupplierOrder[]
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String             @id @default(uuid())
+  name      String
+  email     String             @unique
+  rating    Decimal            @default(1)
+  active    Boolean            @default(true)
+  phone     String?
+  avatar    String             @default("https://img.freepik.com/premium-vector/supplier-icon-vector-image-can-be-used-supply-chain_120816-403225.jpg")
+  createAt  DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+  orders    SupplierOrder[]
+  products  SupplierProducts[]
 }
 
 model Product {
-  id    String      @id @default(uuid())
-  name  String
-  count Decimal     @default(0)
-  type  ProductType
-  image String?
-
-  supplierProducts SupplierProducts[]
+  id               String             @id @default(uuid())
+  name             String
+  count            Decimal            @default(0)
+  type             ProductType
+  image            String?
+  createAt         DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
   mealProducts     Ingredient[]
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  supplierProducts SupplierProducts[]
 
   @@index([type, count, name])
 }
 
 model SupplierProducts {
-  id          String  @id @default(uuid())
+  id          String              @id @default(uuid())
   supplierId  String
   productId   String?
-  quantity    Decimal @default(0)
+  quantity    Decimal             @default(0)
   price       Decimal
-  priceForOne Decimal @default(0)
-  name        String  @default("Need to add name")
-  limit       Decimal @default(1000)
-
-  supplier Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  product  Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-
-  createAt   DateTime            @default(now())
-  updatedAt  DateTime            @updatedAt
-  orderItems SupplierOrderItem[]
+  priceForOne Decimal             @default(0)
+  name        String              @default("Need to add name")
+  limit       Decimal             @default(1000)
+  createAt    DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  orderItems  SupplierOrderItem[]
+  product     Product?            @relation(fields: [productId], references: [id])
+  supplier    Supplier            @relation(fields: [supplierId], references: [id], onDelete: Cascade)
 
   @@index([productId, supplierId])
 }
@@ -167,114 +150,96 @@ model SupplierOrder {
   supplierId String
   totalPrice Decimal             @default(0)
   status     OrderStatus         @default(INITIAL)
+  createAt   DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
   supplier   Supplier            @relation(fields: [supplierId], references: [id], onDelete: Cascade)
   orderItems SupplierOrderItem[]
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@index([status, supplierId])
 }
 
 model SupplierOrderItem {
-  id                String  @id @default(uuid())
+  id                String           @id @default(uuid())
   supplierOrderId   String
   supplierProductId String
-  quantity          Decimal @default(1)
+  quantity          Decimal          @default(1)
   price             Decimal
-
-  order           SupplierOrder    @relation(fields: [supplierOrderId], references: [id], onDelete: Cascade)
-  supplierProduct SupplierProducts @relation(fields: [supplierProductId], references: [id], onDelete: Cascade)
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createAt          DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  order             SupplierOrder    @relation(fields: [supplierOrderId], references: [id], onDelete: Cascade)
+  supplierProduct   SupplierProducts @relation(fields: [supplierProductId], references: [id], onDelete: Cascade)
 }
 
 model Ingredient {
-  id        String  @id @default(uuid())
+  id        String   @id @default(uuid())
   mealId    String
   productId String
-  quantity  Decimal @default(1)
-
-  meal    Meal    @relation(fields: [mealId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-
+  quantity  Decimal  @default(1)
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
+  meal      Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([mealId, productId])
 }
 
 model MealCategory {
-  id       String         @id @default(uuid())
-  name     String
-  slug     String         @unique
-  parentId String?
-  parent   MealCategory?  @relation("Subcategories", fields: [parentId], references: [id])
-  children MealCategory[] @relation("Subcategories")
-  meals    Meal[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String         @id @default(uuid())
+  name      String
+  slug      String         @unique
+  parentId  String?
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  meals     Meal[]
+  parent    MealCategory?  @relation("Subcategories", fields: [parentId], references: [id])
+  children  MealCategory[] @relation("Subcategories")
 }
 
 model Location {
-  id      String  @id @default(uuid())
-  name    String
-  address String
-  phone   String?
-  avatar  String?
-  slug    String  @unique
-
+  id           String         @id @default(uuid())
+  name         String
+  address      String
+  phone        String?
+  avatar       String?
+  slug         String         @unique
   wifiSsid     String?
   wifiPassword String?
-  socialLinks  Json? // { "instagram":"...", "telegram":"...", "facebook":"..." }
-  openingHours Json? // { "mon":[{"from":"09:00","to":"18:00"}], ... }
-
-  meals LocationMeal[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  socialLinks  Json?
+  openingHours Json?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  meals        LocationMeal[]
 }
 
 model LocationMeal {
-  id         String @id @default(uuid())
+  id         String   @id @default(uuid())
   locationId String
   mealId     String
-
-  available Boolean  @default(true)
-  price     Decimal?
-  stock     Int?
-
-  location Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
-  meal     Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  available  Boolean  @default(true)
+  price      Decimal?
+  stock      Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  location   Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  meal       Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
 
   @@unique([locationId, mealId])
 }
 
 model Meal {
-  id          String       @id @default(uuid())
-  name        String
-  description String?
-  image       String?
-  allergens   String[]     @db.Text
-  ingredients Ingredient[]
-  price       Decimal      @default(0)
-  weightMin   Decimal?     @db.Decimal(10, 2)
-  weightMax   Decimal?     @db.Decimal(10, 2)
-  weight      Decimal?     @db.Decimal(10, 2)
-
-  categoryId String?
-  category   MealCategory? @relation(fields: [categoryId], references: [id])
-
-  locations LocationMeal[]
-
+  id                String              @id @default(uuid())
+  name              String
+  description       String?
+  image             String?
+  price             Decimal             @default(0)
+  weight            Decimal?            @db.Decimal(10, 2)
+  categoryId        String?
   createAt          DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   CustomerOrderItem CustomerOrderItem[]
+  ingredients       Ingredient[]
+  locations         LocationMeal[]
+  category          MealCategory?       @relation(fields: [categoryId], references: [id])
 }
 
 model CustomerOrder {
@@ -283,87 +248,71 @@ model CustomerOrder {
   cashierId  String?
   status     CustomerOrderStatus @default(INITIAL)
   totalPrice Decimal             @default(0)
-
-  customer User?    @relation(fields: [customerId], references: [id], onDelete: SetNull)
-  cashier  Cashier? @relation(fields: [cashierId], references: [id], onDelete: SetNull)
-
-  items  CustomerOrderItem[]
-  bill   Bill?               @relation(fields: [billId], references: [id])
-  billId String?
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  billId     String?
+  createAt   DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  bill       Bill?               @relation(fields: [billId], references: [id])
+  cashier    Cashier?            @relation(fields: [cashierId], references: [id])
+  customer   User?               @relation(fields: [customerId], references: [id])
+  items      CustomerOrderItem[]
 
   @@index([status, customerId])
 }
 
 model CustomerOrderItem {
-  id       String  @id @default(uuid())
-  orderId  String
-  mealId   String
-  quantity Int     @default(1)
-  price    Decimal // price per one unit at time of order
-
-  order CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  meal  Meal          @relation(fields: [mealId], references: [id], onDelete: Cascade)
-
-  createAt  DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String        @id @default(uuid())
+  orderId   String
+  mealId    String
+  quantity  Int           @default(1)
+  price     Decimal
+  createAt  DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
   Bill      Bill?
+  meal      Meal          @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  order     CustomerOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@unique([orderId, mealId])
   @@index([orderId, mealId])
 }
 
 model Bill {
-  id      String        @id @default(uuid())
-  orderId String        @unique
-  paid    Boolean       @default(false)
-  method  PaymentMethod
-  paidAt  DateTime?
-
-  order CustomerOrderItem @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  createAt      DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id            String            @id @default(uuid())
+  orderId       String            @unique
+  paid          Boolean           @default(false)
+  method        PaymentMethod
+  paidAt        DateTime?
+  createAt      DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  order         CustomerOrderItem @relation(fields: [orderId], references: [id], onDelete: Cascade)
   CustomerOrder CustomerOrder[]
 }
 
 model FeedbackContact {
-  id          String   @id @default(uuid())
+  id          String     @id @default(uuid())
   name        String?
-  email       String?  @unique
-  phoneE164   String   @unique
+  email       String?    @unique
+  phoneE164   String     @unique
   phoneRegion String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  feedbacks Feedback[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  feedbacks   Feedback[]
 }
 
 model Feedback {
-  id            String  @id @default(uuid())
+  id            String          @id @default(uuid())
   ratingFood    Int
   ratingService Int
-  comment       String? @db.Text
-
-  // антидубль із фронта
-  visitorId  String @db.VarChar(64)
-  deviceHash String @db.VarChar(128)
-
-  // антидубль/аналітика із бека
-  ipHash String @db.VarChar(64)
-  uaHash String @db.VarChar(64)
-
-  // ключ періоду (місяць/тиждень/forever)
-  periodKey String @db.VarChar(20)
-
-  status    FeedbackStatus @default(UNTRIAGED)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-
-  contactId String
-  contact   FeedbackContact @relation(fields: [contactId], references: [id])
+  comment       String?
+  visitorId     String          @db.VarChar(64)
+  deviceHash    String          @db.VarChar(128)
+  ipHash        String          @db.VarChar(64)
+  uaHash        String          @db.VarChar(64)
+  periodKey     String          @db.VarChar(20)
+  status        FeedbackStatus  @default(UNTRIAGED)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  contactId     String
+  contact       FeedbackContact @relation(fields: [contactId], references: [id])
 
   @@unique([visitorId, periodKey], map: "uniq_feedback_visitor_period")
   @@unique([deviceHash, periodKey], map: "uniq_feedback_device_period")
