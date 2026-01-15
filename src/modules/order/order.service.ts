@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { HttpException, Injectable } from "@nestjs/common";
 import { OrderRepository } from "./order.repository";
 import { CustomerOrder } from "@prisma/client";
 import { OrderUpdateDto } from "./dto/request/order-update.dto";
@@ -8,6 +8,72 @@ import { MealRepository } from "../meal/meal.repository";
 @Injectable()
 export class OrderService {
   constructor(private orderRepository: OrderRepository, private mealRepository: MealRepository) { }
+
+  async getTransactions() {
+    return this.orderRepository.getTransactionsForFpgrowth();
+  }
+
+  async runFpgrowthFromDb(
+    minSupport?: number,
+    minConfidence?: number,
+  ) {
+    const transactions = await this.getTransactions();
+    if (transactions.length === 0) {
+      throw new HttpException("No transactions available for analytics", 400);
+    }
+
+    return this.runFpgrowth(transactions, minSupport, minConfidence);
+  }
+
+
+  private readonly fpgrowthUrl = process.env.FPGROWTH_URL ?? "http://localhost:3021/fpgrowth";
+
+  async runFpgrowth(
+    transactions: string[][],
+    minSupport?: number,
+    minConfidence?: number,
+  ) {
+    const payload: {
+      transactions: string[][];
+      minSupport?: number;
+      minConfidence?: number;
+    } = { transactions };
+
+    if (typeof minSupport === "number") {
+      payload.minSupport = minSupport;
+    }
+
+    if (typeof minConfidence === "number") {
+      payload.minConfidence = minConfidence;
+    }
+
+    const response = await fetch(this.fpgrowthUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const text = await response.text();
+    const data = text ? this.parseFpgrowthResponse(text) : null;
+
+    if (!response.ok) {
+      const message =
+        typeof data === "string"
+          ? data
+          : data?.error ?? "FPGrowth request failed";
+      throw new HttpException(message, response.status);
+    }
+
+    return data;
+  }
+
+  private parseFpgrowthResponse(text: string) {
+    try {
+      return JSON.parse(text);
+    } catch {
+      return text;
+    }
+  }
 
   // async getCustomerOrder(customerId: string) {
   //   return await this.orderRepository.getCustomerOrder(customerId);

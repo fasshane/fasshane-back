@@ -3,6 +3,7 @@ import { OrderService } from './order.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { OrderUpdateDto } from './dto/request/order-update.dto';
 import { OrderCreateDto } from './dto/request/order-create.dto';
+import { FpgrowthParamsDto } from './dto/request/fpgrowth-params.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('order')
@@ -35,6 +36,19 @@ export class OrderController {
     const customerId = req.user.id;
     // TODO: handle error when customerId is null or smth
     return this.orderService.getCurrentOrder(customerId);
+  }
+
+  @Get('transactions')
+  async getTransactions() {
+    return this.orderService.getTransactions();
+  }
+
+  @Post('fpgrowth')
+  async runFpgrowth(@Body() dto: FpgrowthParamsDto) {
+    return this.orderService.runFpgrowthFromDb(
+      dto?.minSupport,
+      dto?.minConfidence,
+    );
   }
 
   @Patch('addToOrder')

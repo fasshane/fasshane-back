@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { CustomerOrder, CustomerOrderStatus } from "@prisma/client";
 import { PrismaService } from "nestjs-prisma";
 import { OrderUpdateDto } from "./dto/request/order-update.dto";
@@ -7,6 +7,30 @@ import { OrderCreateDto, OrderItemDto } from "./dto/request/order-create.dto";
 @Injectable()
 export class OrderRepository {
     constructor(private prisma: PrismaService) {
+    }
+
+    private async getValidatedMealIds(items: OrderItemDto[]): Promise<string[]> {
+        if (!items.length) {
+            throw new BadRequestException("Order must include at least one item");
+        }
+
+        const ids = items.map(item => item.meal?.id ?? item.id).filter(Boolean);
+        if (ids.length !== items.length) {
+            throw new BadRequestException("Each order item must include a valid meal id");
+        }
+
+        const uniqueIds = Array.from(new Set(ids));
+        const existing = await this.prisma.meal.findMany({
+            where: { id: { in: uniqueIds } },
+            select: { id: true },
+        });
+        const existingIds = new Set(existing.map(m => m.id));
+        const missing = uniqueIds.filter(id => !existingIds.has(id));
+        if (missing.length) {
+            throw new BadRequestException(`Meals not found: ${missing.join(", ")}`);
+        }
+
+        return ids;
     }
 
     async createOrder(customerId: string): Promise<CustomerOrder> {
@@ -20,16 +44,17 @@ export class OrderRepository {
     }
 
     async createOrderByCashier(cashierId: string, dto: OrderCreateDto): Promise<{ id: string }> {
+        const mealIds = await this.getValidatedMealIds(dto.items);
         const order = await this.prisma.customerOrder.create({
             data: {
                 cashierId,
                 totalPrice: dto.totalPrice,
                 status: CustomerOrderStatus.INITIAL,
                 items: {
-                    create: dto.items.map((item: OrderItemDto) => ({
+                    create: dto.items.map((item: OrderItemDto, index: number) => ({
                         quantity: item.quantity,
                         price: item.price,
-                        mealId: item.meal.id,
+                        mealId: mealIds[index],
                     })),
                 },
             },
@@ -197,17 +222,46 @@ export class OrderRepository {
         return { message: 'Order updated successfully' };
     }
 
+    async getTransactionsForFpgrowth(): Promise<string[][]> {
+        const orders = await this.prisma.customerOrder.findMany({
+            where: {
+                status: CustomerOrderStatus.SUCCESS,
+            },
+            include: {
+                items: {
+                    include: {
+                        meal: {
+                            select: {
+                                name: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        console.log('orders!!!', orders)
+        return orders
+            .map(order =>
+                order.items
+                    .map(item => item.meal?.name ?? item.mealId)
+                    .filter(Boolean),
+            )
+            .filter(items => items.length > 0);
+    }
+
     async payOrder(orderDto: OrderCreateDto) {
+        const mealIds = await this.getValidatedMealIds(orderDto.items);
         const order = await this.prisma.customerOrder.create({
             data: {
                 customerId: orderDto.customerId,
                 totalPrice: orderDto.totalPrice,
-                status: CustomerOrderStatus.INITIAL,
+                status: CustomerOrderStatus.SUCCESS,
                 items: {
-                    create: orderDto.items.map((item: OrderItemDto) => ({
+                    create: orderDto.items.map((item: OrderItemDto, index: number) => ({
                         quantity: item.quantity,
                         price: item.price,
-                        mealId: item.meal.id,
+                        mealId: mealIds[index],
                     })),
                 },
             },
